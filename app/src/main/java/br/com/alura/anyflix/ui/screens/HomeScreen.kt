@@ -56,13 +56,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import br.com.alura.anyflix.model.Movie
 import br.com.alura.anyflix.ui.theme.AnyFlixTheme
 import coil.compose.AsyncImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    onMovieClick: () -> Unit = {}
+    onMovieClick: (Movie) -> Unit = {}
 ) {
     Box {
         CenterAlignedTopAppBar(
@@ -253,7 +254,7 @@ fun HomeScreen(
 @Composable
 fun MovieSection(
     title: String,
-    onMovieClick: () -> Unit
+    onMovieClick: (Movie) -> Unit
 ) {
     Text(
         text = title,
@@ -274,7 +275,11 @@ fun MovieSection(
                         .width(150.dp)
                         .height(200.dp)
                         .clip(RoundedCornerShape(8.dp))
-                        .clickable { onMovieClick() },
+                        .clickable {
+                            onMovieClick(
+                                Movie()
+                            )
+                        },
                     placeholder = ColorPainter(Color.Gray.copy(alpha = 0.9f)),
                     contentScale = ContentScale.Crop
                 )

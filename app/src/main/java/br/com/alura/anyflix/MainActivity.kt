@@ -13,6 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import br.com.alura.anyflix.navigation.AnyflixNavHost
 import br.com.alura.anyflix.ui.screens.HomeScreen
 import br.com.alura.anyflix.ui.screens.MovieDetailsScreen
 import br.com.alura.anyflix.ui.theme.AnyFlixTheme
@@ -26,37 +27,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val navController = rememberNavController()
-                    NavHost(navController = navController, startDestination = "home") {
-                        composable("home") {
-                            HomeScreen(
-                                onMovieClick = {
-                                    navController.navigate("movieDetails")
-                                }
-                            )
-                        }
-                        composable("movieDetails") {
-                            MovieDetailsScreen()
-                        }
-                    }
+                    AnyflixNavHost()
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    AnyFlixTheme {
-        Greeting("Android")
     }
 }
