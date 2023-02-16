@@ -54,7 +54,8 @@ import coil.compose.AsyncImage
 @Composable
 fun MovieDetailsScreen(
     movie: Movie,
-    onMovieClick: (Movie) -> Unit
+    onMovieClick: (Movie) -> Unit,
+    onAddToMyListClick: (Movie) -> Unit
 ) {
     val movies = remember {
         sampleMovies.shuffled()
@@ -116,7 +117,11 @@ fun MovieDetailsScreen(
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 Column(
-                    Modifier.widthIn(50.dp),
+                    Modifier
+                        .widthIn(50.dp)
+                        .clickable {
+                            onAddToMyListClick(movie)
+                        },
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -207,7 +212,10 @@ fun MovieDetailsScreen(
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(text = LoremIpsum(3).values.first().toString(), Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+            Text(
+                text = LoremIpsum(3).values.first().toString(),
+                Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            )
             LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
@@ -241,7 +249,8 @@ fun MovieDetailsScreenPreview() {
         Surface(color = MaterialTheme.colorScheme.background) {
             MovieDetailsScreen(
                 sampleMovies.random(),
-                onMovieClick = {}
+                onMovieClick = {},
+                onAddToMyListClick = {}
             )
         }
     }

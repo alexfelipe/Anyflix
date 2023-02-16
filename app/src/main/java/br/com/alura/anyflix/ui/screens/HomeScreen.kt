@@ -41,13 +41,15 @@ import coil.compose.AsyncImage
 
 @Composable
 fun HomeScreen(
+    favoriteMovies: List<Movie>,
     onMovieClick: (Movie) -> Unit = {},
     onProfileMenuClick: () -> Unit = {}
 ) {
     Box {
         AnyflixTopAppBar(
             title = "Anyflix",
-            modifier = Modifier.zIndex(1f)
+            modifier = Modifier
+                .zIndex(1f)
                 .drawWithContent {
                     val colors = listOf(
                         Color.Black,
@@ -75,10 +77,54 @@ fun HomeScreen(
                     onMovieClick = onMovieClick
                 )
             }
+            if (favoriteMovies.isNotEmpty()) {
+                item {
+                    val title = "My list"
+                    Column {
+                        Text(
+                            text = title,
+                            Modifier.padding(
+                                horizontal = 16.dp,
+                                vertical = 8.dp
+                            ),
+                            style = TextStyle.Default.copy(
+                                fontSize = MaterialTheme.typography.titleMedium.fontSize
+                            )
+                        )
+                        LazyRow(
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                            contentPadding = PaddingValues(
+                                horizontal = 16.dp,
+                                vertical = 8.dp
+                            )
+                        ) {
+                            items(favoriteMovies) { movie ->
+                                Box {
+                                    AsyncImage(
+                                        model = movie.image,
+                                        contentDescription = null,
+                                        Modifier
+                                            .width(150.dp)
+                                            .height(200.dp)
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .clickable {
+                                                onMovieClick(movie)
+                                            },
+                                        placeholder = ColorPainter(Color.Gray),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             items(3) {
+                val title = LoremIpsum(2).values.first().toString()
+                val movies = sampleMovies.shuffled()
                 Column {
                     Text(
-                        text = LoremIpsum(2).values.first().toString(),
+                        text = title,
                         Modifier.padding(
                             horizontal = 16.dp,
                             vertical = 8.dp
@@ -87,9 +133,6 @@ fun HomeScreen(
                             fontSize = MaterialTheme.typography.titleMedium.fontSize
                         )
                     )
-                    val movies = remember {
-                        sampleMovies.shuffled()
-                    }
                     LazyRow(
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
                         contentPadding = PaddingValues(
@@ -144,7 +187,7 @@ fun HomeScreen(
 fun HomeScreenPreview() {
     AnyFlixTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
-            HomeScreen()
+            HomeScreen(emptyList())
         }
     }
 }
