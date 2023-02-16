@@ -13,7 +13,18 @@ fun AnyflixNavHost(
         navController = navController,
         startDestination = homeRoute
     ) {
-        homeScreen(navController)
-        movieDetailsScreen()
+        homeScreen(
+            onNavigateToMovieDetails = { movie ->
+                navController.navigateToMovieDetails(movie.id)
+            }
+        )
+        movieDetailsScreen(
+            onNavigateToMovieDetails = { movie ->
+                navController.navigateToMovieDetails(movie.id)
+            },
+            onPopBackStack = {
+                navController.popBackStack()
+            }
+        )
     }
 }

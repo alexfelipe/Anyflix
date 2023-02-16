@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -43,11 +45,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
+import br.com.alura.anyflix.model.Movie
+import br.com.alura.anyflix.sampleData.randomImage
+import br.com.alura.anyflix.sampleData.sampleMovies
 import br.com.alura.anyflix.ui.theme.AnyFlixTheme
 import coil.compose.AsyncImage
 
 @Composable
-fun MovieDetailsScreen() {
+fun MovieDetailsScreen(
+    movie: Movie,
+    onMovieClick: (Movie) -> Unit
+) {
+    val movies = remember {
+        sampleMovies.shuffled()
+    }
     val imageHeight = remember {
         200.dp
     }
@@ -57,7 +68,7 @@ fun MovieDetailsScreen() {
     ) {
         Box {
             AsyncImage(
-                model = "https://picsum.photos/1920/1080", contentDescription = null,
+                model = movie.image, contentDescription = null,
                 Modifier
                     .fillMaxWidth()
                     .height(imageHeight)
@@ -74,7 +85,7 @@ fun MovieDetailsScreen() {
                             ),
                         )
                     },
-                placeholder = ColorPainter(Color.Gray.copy(alpha = 0.5f)),
+                placeholder = ColorPainter(Color.Gray),
                 contentScale = ContentScale.Crop
             )
 
@@ -84,12 +95,12 @@ fun MovieDetailsScreen() {
                     .offset(y = imageHeight / 2)
             ) {
                 AsyncImage(
-                    model = "https://picsum.photos/1920/1080", contentDescription = null,
+                    model = movie.image, contentDescription = null,
                     Modifier
                         .width(150.dp)
                         .height(imageHeight)
                         .clip(RoundedCornerShape(8.dp)),
-                    placeholder = ColorPainter(Color.Gray.copy(alpha = 0.5f)),
+                    placeholder = ColorPainter(Color.Gray),
                     contentScale = ContentScale.Crop
                 )
             }
@@ -129,13 +140,15 @@ fun MovieDetailsScreen() {
         Box(
             Modifier
                 .padding(16.dp)
+
                 .fillMaxWidth()
                 .background(
                     Color.Red,
                     shape = RoundedCornerShape(50)
                 )
+                .clip(RoundedCornerShape(50))
+                .clickable { }
                 .padding(8.dp)
-                .clickable { },
         ) {
             Row(
                 Modifier.align(Center)
@@ -155,24 +168,32 @@ fun MovieDetailsScreen() {
                 .values.first(),
             Modifier.padding(16.dp)
         )
-        LazyRow {
+        LazyRow(
+            contentPadding = PaddingValues(
+                horizontal = 16.dp,
+                vertical = 8.dp
+            ),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             items(3) {
                 AsyncImage(
-                    model = "https://picsum.photos/1920/1080", contentDescription = null,
+                    model = randomImage,
+                    contentDescription = null,
                     Modifier
-                        .padding(8.dp)
                         .size(50.dp)
                         .clip(CircleShape),
-                    placeholder = ColorPainter(Color.Gray.copy(alpha = 0.5f)),
+                    placeholder = ColorPainter(Color.Gray),
                     contentScale = ContentScale.Crop
                 )
             }
             item {
                 Box(
                     modifier = Modifier
-                        .padding(8.dp)
                         .size(50.dp)
-                        .border(2.dp, Color.White, shape = CircleShape)
+                        .border(
+                            2.dp, Color.White,
+                            shape = CircleShape
+                        )
                         .clip(CircleShape)
                 ) {
                     Icon(
@@ -183,7 +204,33 @@ fun MovieDetailsScreen() {
                 }
             }
         }
-
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(text = LoremIpsum(3).values.first().toString(), Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                items(movies) { movie ->
+                    Box {
+                        AsyncImage(
+                            model = movie.image,
+                            contentDescription = null,
+                            Modifier
+                                .width(150.dp)
+                                .height(200.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .clickable {
+                                    onMovieClick(movie)
+                                },
+                            placeholder = ColorPainter(Color.Gray),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -192,7 +239,10 @@ fun MovieDetailsScreen() {
 fun MovieDetailsScreenPreview() {
     AnyFlixTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
-            MovieDetailsScreen()
+            MovieDetailsScreen(
+                sampleMovies.random(),
+                onMovieClick = {}
+            )
         }
     }
 }
