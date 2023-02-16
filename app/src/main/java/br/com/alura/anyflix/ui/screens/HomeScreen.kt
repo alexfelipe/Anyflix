@@ -20,6 +20,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
@@ -44,7 +47,18 @@ fun HomeScreen(
     Box {
         AnyflixTopAppBar(
             title = "Anyflix",
-            modifier = Modifier.zIndex(1f),
+            modifier = Modifier.zIndex(1f)
+                .drawWithContent {
+                    val colors = listOf(
+                        Color.Black,
+                        Color.Transparent
+                    )
+                    drawRect(
+                        brush = Brush.verticalGradient(colors),
+                        blendMode = BlendMode.Darken
+                    )
+                    drawContent()
+                },
             onProfileMenuClick = onProfileMenuClick,
         )
         LazyColumn(
@@ -110,6 +124,17 @@ fun HomeScreen(
                     Alignment.BottomCenter
                 )
                 .zIndex(1f)
+                .drawWithContent {
+                    val colors = listOf(
+                        Color.Transparent,
+                        Color.Black
+                    )
+                    drawRect(
+                        brush = Brush.verticalGradient(colors),
+                        blendMode = BlendMode.Darken
+                    )
+                    drawContent()
+                }
         )
     }
 }

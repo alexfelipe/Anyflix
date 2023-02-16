@@ -38,18 +38,7 @@ fun AnyflixBottomAppBar(
     onItemClick: (BottomAppBarItem) -> Unit = {},
 ) {
     BottomAppBar(
-        modifier
-            .drawWithContent {
-                val colors = listOf(
-                    Color.Transparent,
-                    Color.Black
-                )
-                drawRect(
-                    brush = Brush.verticalGradient(colors),
-                    blendMode = BlendMode.Darken
-                )
-                drawContent()
-            },
+        modifier,
         containerColor = Color.Transparent,
     ) {
         items.forEach {
