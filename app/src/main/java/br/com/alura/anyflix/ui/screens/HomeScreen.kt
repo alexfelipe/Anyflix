@@ -43,7 +43,8 @@ import coil.compose.AsyncImage
 fun HomeScreen(
     favoriteMovies: List<Movie>,
     onMovieClick: (Movie) -> Unit = {},
-    onProfileMenuClick: () -> Unit = {}
+    onProfileMenuClick: () -> Unit = {},
+    onMyListClick: () -> Unit = {}
 ) {
     Box {
         AnyflixTopAppBar(
@@ -74,7 +75,8 @@ fun HomeScreen(
                 }
                 AnyflixMainBanner(
                     movie = movie,
-                    onMovieClick = onMovieClick
+                    onMovieClick = onMovieClick,
+                    onMyListClick = onMyListClick
                 )
             }
             if (favoriteMovies.isNotEmpty()) {

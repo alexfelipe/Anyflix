@@ -3,6 +3,7 @@ package br.com.alura.anyflix.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -119,7 +120,12 @@ fun MovieDetailsScreen(
                 Column(
                     Modifier
                         .widthIn(50.dp)
-                        .clickable {
+                        .clickable(
+                            indication = null,
+                            interactionSource = remember {
+                                MutableInteractionSource()
+                            }
+                        ) {
                             onAddToMyListClick(movie)
                         },
                     verticalArrangement = Arrangement.Center,

@@ -7,28 +7,25 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import br.com.alura.anyflix.dao.MovieDao
-import br.com.alura.anyflix.model.Movie
-import br.com.alura.anyflix.ui.screens.HomeScreen
+import br.com.alura.anyflix.ui.screens.UserMoviesScreen
 
-internal const val homeRoute = "home"
+internal const val userMoviesRoute = "userMovies"
 
-fun NavGraphBuilder.homeScreen(
-    onNavigateToMovieDetails: (Movie) -> Unit,
-    onNavigateToMyList: () -> Unit
+fun NavGraphBuilder.userMoviesScreen(
+    onNavigateToUserMovies: () -> Unit,
 ) {
-    composable(homeRoute) {
+    composable(userMoviesRoute) {
         val dao = remember {
             MovieDao()
         }
         val movies by dao.movies.collectAsState(emptyList())
-        HomeScreen(
-            favoriteMovies = movies,
-            onMovieClick = onNavigateToMovieDetails,
-            onMyListClick = onNavigateToMyList
+        UserMoviesScreen(
+            movies = movies,
+            onSeeOtherMovies = onNavigateToUserMovies
         )
     }
 }
 
-fun NavController.navigateToHome() {
-    navigate(homeRoute)
+fun NavController.navigateToUserMovies() {
+    navigate(userMoviesRoute)
 }

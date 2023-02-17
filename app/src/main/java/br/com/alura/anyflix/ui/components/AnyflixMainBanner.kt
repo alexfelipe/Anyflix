@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,14 +27,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import br.com.alura.anyflix.model.Movie
+import br.com.alura.anyflix.sampleData.sampleMovies
+import br.com.alura.anyflix.ui.theme.AnyFlixTheme
 import coil.compose.AsyncImage
 
 @Composable
 fun AnyflixMainBanner(
     movie: Movie,
     onMovieClick: (Movie) -> Unit,
+    onMyListClick: () -> Unit
 ) {
     Box(
         Modifier
@@ -46,10 +51,9 @@ fun AnyflixMainBanner(
                 .fillMaxWidth()
                 .drawWithContent {
                     val colors = listOf(
-                        Color.Black.copy(0.5f),
+                        Color.Black,
                         Color.Transparent,
-                        Color.Transparent,
-                        Color.Black.copy(alpha = 0.9f),
+                        Color.Black,
                     )
                     drawContent()
                     drawRect(
@@ -74,7 +78,11 @@ fun AnyflixMainBanner(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Column(
-                Modifier.widthIn(50.dp),
+                Modifier
+                    .widthIn(50.dp)
+                    .clickable {
+                        onMyListClick()
+                    },
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -111,6 +119,20 @@ fun AnyflixMainBanner(
                 Icon(Icons.Default.Info, contentDescription = null)
                 Text(text = "Info")
             }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun AnyflixMainBannerPreview() {
+    AnyFlixTheme {
+        Surface {
+            AnyflixMainBanner(
+                movie = sampleMovies.random(),
+                onMovieClick = {},
+                onMyListClick = {}
+            )
         }
     }
 }

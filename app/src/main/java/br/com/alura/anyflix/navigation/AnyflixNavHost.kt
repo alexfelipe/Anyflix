@@ -16,6 +16,9 @@ fun AnyflixNavHost(
         homeScreen(
             onNavigateToMovieDetails = { movie ->
                 navController.navigateToMovieDetails(movie.id)
+            },
+            onNavigateToMyList = {
+                navController.navigateToUserMovies()
             }
         )
         movieDetailsScreen(
@@ -24,6 +27,11 @@ fun AnyflixNavHost(
             },
             onPopBackStack = {
                 navController.popBackStack()
+            }
+        )
+        userMoviesScreen(
+            onNavigateToUserMovies = {
+                navController.navigateToHome()
             }
         )
     }
