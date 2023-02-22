@@ -16,25 +16,9 @@ val randomTitle
     get() = LoremIpsum(Random.nextInt(1, 3)).values
         .first().toString()
 
-val sampleMovies = listOf(
+val sampleMovies = List(15) {
     Movie(
         title = randomTitle,
         image = randomImage
-    ),
-    Movie(
-        title = randomTitle,
-        image = randomImage
-    ),
-    Movie(
-        title = randomTitle,
-        image = randomImage
-    ),
-    Movie(
-        title = randomTitle,
-        image = randomImage
-    ),
-    Movie(
-        title = randomTitle,
-        image = randomImage
-    ),
-)
+    )
+}

@@ -1,5 +1,7 @@
 package br.com.alura.anyflix.ui.screens
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,9 +10,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -24,6 +31,7 @@ import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import br.com.alura.anyflix.model.Movie
 import br.com.alura.anyflix.sampleData.sampleMovies
 import br.com.alura.anyflix.ui.theme.AnyFlixTheme
@@ -33,7 +41,9 @@ import coil.compose.AsyncImage
 fun UserMoviesScreen(
     movies: List<Movie>,
     onSeeOtherMovies: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onMovieClick: (Movie) -> Unit,
+    onRemoveMovieFromMyList: (Movie) -> Unit
 ) {
     if (movies.isEmpty()) {
         Box(
@@ -70,18 +80,41 @@ fun UserMoviesScreen(
                     Column(
                         Modifier
                             .fillMaxWidth()
-                            .height(200.dp),
+                            .height(200.dp)
+                            .clickable {
+                                onMovieClick(movie)
+                            },
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(text = movie.title)
-                        AsyncImage(
-                            model = movie.image,
-                            contentDescription = null,
-                            Modifier
-                                .clip(RoundedCornerShape(8.dp)),
-                            placeholder = ColorPainter(Color.Gray),
-                            contentScale = ContentScale.Crop
-                        )
+                        Box {
+                            Box(
+                                Modifier
+                                    .padding(16.dp)
+                                    .size(50.dp)
+                                    .background(
+                                        color = Color.Black.copy(alpha = 0.5f),
+                                        shape = CircleShape
+                                    )
+                                    .align(Alignment.TopEnd)
+                                    .clickable { onRemoveMovieFromMyList(movie) }
+                            ) {
+                                Icon(
+                                    Icons.Default.Close, contentDescription = null, Modifier.align(
+                                        Alignment.Center
+                                    )
+                                )
+                            }
+                            AsyncImage(
+                                model = movie.image,
+                                contentDescription = null,
+                                Modifier
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .zIndex(-1f),
+                                placeholder = ColorPainter(Color.Gray),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
                     }
                 }
             }
@@ -97,7 +130,9 @@ fun UserMoviesScreenPreview() {
         Surface(color = MaterialTheme.colorScheme.background) {
             UserMoviesScreen(
                 sampleMovies,
-                onSeeOtherMovies = {}
+                onSeeOtherMovies = {},
+                onRemoveMovieFromMyList = {},
+                onMovieClick = {}
             )
         }
     }
@@ -110,7 +145,9 @@ fun UserMoviesScreenWithoutMoviesPreview() {
         Surface(color = MaterialTheme.colorScheme.background) {
             UserMoviesScreen(
                 movies = emptyList(),
-                onSeeOtherMovies = {}
+                onSeeOtherMovies = {},
+                onRemoveMovieFromMyList = {},
+                onMovieClick = {}
             )
         }
     }

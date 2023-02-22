@@ -20,7 +20,7 @@ fun NavGraphBuilder.homeScreen(
         val dao = remember {
             MovieDao()
         }
-        val movies by dao.movies.collectAsState(emptyList())
+        val movies by dao.favoriteMovies.collectAsState(emptyList())
         HomeScreen(
             favoriteMovies = movies,
             onMovieClick = onNavigateToMovieDetails,

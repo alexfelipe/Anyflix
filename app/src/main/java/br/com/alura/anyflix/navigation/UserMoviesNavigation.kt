@@ -7,21 +7,27 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import br.com.alura.anyflix.dao.MovieDao
+import br.com.alura.anyflix.model.Movie
 import br.com.alura.anyflix.ui.screens.UserMoviesScreen
 
 internal const val userMoviesRoute = "userMovies"
 
 fun NavGraphBuilder.userMoviesScreen(
     onNavigateToUserMovies: () -> Unit,
+    onNavigateToMovieDetails: (Movie) -> Unit
 ) {
     composable(userMoviesRoute) {
         val dao = remember {
             MovieDao()
         }
-        val movies by dao.movies.collectAsState(emptyList())
+        val movies by dao.favoriteMovies.collectAsState(emptyList())
         UserMoviesScreen(
             movies = movies,
-            onSeeOtherMovies = onNavigateToUserMovies
+            onSeeOtherMovies = onNavigateToUserMovies,
+            onRemoveMovieFromMyList = {
+                dao.removeFromFavoriteMovies(it)
+            } ,
+            onMovieClick = onNavigateToMovieDetails
         )
     }
 }

@@ -32,6 +32,9 @@ fun AnyflixNavHost(
         userMoviesScreen(
             onNavigateToUserMovies = {
                 navController.navigateToHome()
+            },
+            onNavigateToMovieDetails = {
+                navController.navigateToMovieDetails(it.id)
             }
         )
     }

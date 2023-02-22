@@ -1,6 +1,8 @@
 package br.com.alura.anyflix.navigation
 
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -9,6 +11,7 @@ import br.com.alura.anyflix.dao.MovieDao
 import br.com.alura.anyflix.model.Movie
 import br.com.alura.anyflix.sampleData.sampleMovies
 import br.com.alura.anyflix.ui.screens.MovieDetailsScreen
+import br.com.alura.anyflix.ui.uistates.MovieDetailsUiState
 
 internal const val movieDetailsRoute = "movieDetails"
 private const val movieIdArgument = "movieId"
@@ -26,11 +29,32 @@ fun NavGraphBuilder.movieDetailsScreen(
             val dao = remember {
                 MovieDao()
             }
+            val favoriteMovies by dao.favoriteMovies.collectAsState(emptyList())
+            val movies by dao.movies.collectAsState()
+            val suggestedMovies = remember(movie) {
+                movies.shuffled().take(10)
+            }
+            val isMovieAddedToFavoriteList = remember(favoriteMovies) {
+                favoriteMovies.contains(movie)
+            }
+            val uiState = remember(
+                suggestedMovies,
+                isMovieAddedToFavoriteList
+            ) {
+                MovieDetailsUiState(
+                    movie = movie,
+                    isMovieAddedToFavoriteList = isMovieAddedToFavoriteList,
+                    suggestedMovies = suggestedMovies
+                )
+            }
             MovieDetailsScreen(
-                movie = movie,
+                uiState = uiState,
                 onMovieClick = onNavigateToMovieDetails,
                 onAddToMyListClick = {
-                    dao.add(it)
+                    dao.addToFavoriteMovies(it)
+                },
+                onRemoveFromMyList = {
+                    dao.removeFromFavoriteMovies(it)
                 }
             )
         } ?: LaunchedEffect(null) {

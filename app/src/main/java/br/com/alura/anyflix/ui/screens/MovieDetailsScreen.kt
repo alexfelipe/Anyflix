@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -24,9 +25,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -50,214 +53,268 @@ import br.com.alura.anyflix.model.Movie
 import br.com.alura.anyflix.sampleData.randomImage
 import br.com.alura.anyflix.sampleData.sampleMovies
 import br.com.alura.anyflix.ui.theme.AnyFlixTheme
+import br.com.alura.anyflix.ui.uistates.MovieDetailsUiState
 import coil.compose.AsyncImage
 
 @Composable
 fun MovieDetailsScreen(
-    movie: Movie,
+    uiState: MovieDetailsUiState,
     onMovieClick: (Movie) -> Unit,
-    onAddToMyListClick: (Movie) -> Unit
+    onAddToMyListClick: (Movie) -> Unit,
+    onRemoveFromMyList: (Movie) -> Unit
 ) {
-    val movies = remember {
-        sampleMovies.shuffled()
-    }
-    val imageHeight = remember {
-        200.dp
-    }
-    Column(
-        Modifier
-            .verticalScroll(rememberScrollState())
-    ) {
-        Box {
-            AsyncImage(
-                model = movie.image, contentDescription = null,
-                Modifier
-                    .fillMaxWidth()
-                    .height(imageHeight)
-                    .clip(RoundedCornerShape(8.dp))
-                    .drawWithContent {
-                        val colors = listOf(
-                            Color.Transparent,
-                            Color.Black.copy(alpha = 0.9f),
-                        )
-                        drawContent()
-                        drawRect(
-                            brush = Brush.verticalGradient(
-                                colors
-                            ),
-                        )
-                    },
-                placeholder = ColorPainter(Color.Gray),
-                contentScale = ContentScale.Crop
-            )
-
-            Row(
-                Modifier
-                    .padding(16.dp)
-                    .offset(y = imageHeight / 2)
-            ) {
-                AsyncImage(
-                    model = movie.image, contentDescription = null,
-                    Modifier
-                        .width(150.dp)
-                        .height(imageHeight)
-                        .clip(RoundedCornerShape(8.dp)),
-                    placeholder = ColorPainter(Color.Gray),
-                    contentScale = ContentScale.Crop
-                )
-            }
-        }
-        Row(
-            modifier = Modifier
-                .height(imageHeight / 2)
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(0.5f),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                Column(
-                    Modifier
-                        .widthIn(50.dp)
-                        .clickable(
-                            indication = null,
-                            interactionSource = remember {
-                                MutableInteractionSource()
-                            }
-                        ) {
-                            onAddToMyListClick(movie)
-                        },
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = null)
-                    Text(
-                        text = "Add to my list",
-                        textAlign = TextAlign.Center,
-                    )
-                }
-                Column(
-                    Modifier.widthIn(50.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Icon(Icons.Default.Info, contentDescription = null)
-                    Text(text = "Info")
-                }
-            }
-
-        }
-        Box(
-            Modifier
-                .padding(16.dp)
-
-                .fillMaxWidth()
-                .background(
-                    Color.Red,
-                    shape = RoundedCornerShape(50)
-                )
-                .clip(RoundedCornerShape(50))
-                .clickable { }
-                .padding(8.dp)
-        ) {
-            Row(
-                Modifier.align(Center)
-            ) {
-                Icon(
-                    Icons.Default.PlayArrow,
-                    contentDescription = null
-                )
-                Text(
-                    text = "Play",
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
-        Text(
-            text = LoremIpsum(30)
-                .values.first(),
-            Modifier.padding(16.dp)
-        )
-        LazyRow(
-            contentPadding = PaddingValues(
-                horizontal = 16.dp,
-                vertical = 8.dp
-            ),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(3) {
-                AsyncImage(
-                    model = randomImage,
-                    contentDescription = null,
-                    Modifier
-                        .size(50.dp)
-                        .clip(CircleShape),
-                    placeholder = ColorPainter(Color.Gray),
-                    contentScale = ContentScale.Crop
-                )
-            }
-            item {
-                Box(
-                    modifier = Modifier
-                        .size(50.dp)
-                        .border(
-                            2.dp, Color.White,
-                            shape = CircleShape
-                        )
-                        .clip(CircleShape)
-                ) {
-                    Icon(
-                        Icons.Default.MoreHoriz,
-                        contentDescription = "Mais atores",
-                        Modifier.align(Center)
-                    )
-                }
-            }
+    uiState.movie?.let { movie ->
+        val imageHeight = remember {
+            200.dp
         }
         Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            Modifier
+                .verticalScroll(rememberScrollState())
         ) {
+            Box {
+                AsyncImage(
+                    model = movie.image,
+                    contentDescription = null,
+                    Modifier
+                        .fillMaxWidth()
+                        .height(imageHeight)
+                        .clip(RoundedCornerShape(8.dp))
+                        .drawWithContent {
+                            val colors = listOf(
+                                Color.Transparent,
+                                Color.Black.copy(alpha = 0.9f),
+                            )
+                            drawContent()
+                            drawRect(
+                                brush = Brush.verticalGradient(
+                                    colors
+                                ),
+                            )
+                        },
+                    placeholder = ColorPainter(Color.Gray),
+                    contentScale = ContentScale.Crop
+                )
+
+                Row(
+                    Modifier
+                        .padding(16.dp)
+                        .offset(y = imageHeight / 2)
+                ) {
+                    AsyncImage(
+                        model = movie.image, contentDescription = null,
+                        Modifier
+                            .width(150.dp)
+                            .height(imageHeight)
+                            .clip(RoundedCornerShape(8.dp)),
+                        placeholder = ColorPainter(Color.Gray),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+            }
+            Row(
+                modifier = Modifier
+                    .height(imageHeight / 2)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(0.5f),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Column(
+                        Modifier
+                            .padding(8.dp)
+                            .widthIn(50.dp)
+                            .clickable {
+                                if(uiState.isMovieAddedToFavoriteList) {
+                                    onRemoveFromMyList(movie)
+                                } else {
+                                    onAddToMyListClick(movie)
+                                }
+                            },
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        val (icon, message) = if (uiState.isMovieAddedToFavoriteList) {
+                            Pair(Icons.Default.Done, "Added")
+                        } else {
+                            Pair(Icons.Default.Add, "Add to my list")
+                        }
+                        Icon(
+                            icon,
+                            contentDescription = null
+                        )
+                        Text(
+                            text = message,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                    Column(
+                        Modifier
+                            .padding(8.dp)
+                            .widthIn(50.dp),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(Icons.Default.Info, contentDescription = null)
+                        Text(text = "Info")
+                    }
+                }
+
+            }
+            Box(
+                Modifier
+                    .padding(16.dp)
+
+                    .fillMaxWidth()
+                    .background(
+                        Color.Red,
+                        shape = RoundedCornerShape(50)
+                    )
+                    .clip(RoundedCornerShape(50))
+                    .clickable { }
+                    .padding(8.dp)
+            ) {
+                Row(
+                    Modifier.align(Center)
+                ) {
+                    Icon(
+                        Icons.Default.PlayArrow,
+                        contentDescription = null
+                    )
+                    Text(
+                        text = "Play",
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
             Text(
-                text = LoremIpsum(3).values.first().toString(),
-                Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                text = LoremIpsum(30)
+                    .values.first(),
+                Modifier.padding(16.dp)
             )
             LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                contentPadding = PaddingValues(
+                    horizontal = 16.dp,
+                    vertical = 8.dp
+                ),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(movies) { movie ->
-                    Box {
-                        AsyncImage(
-                            model = movie.image,
-                            contentDescription = null,
-                            Modifier
-                                .width(150.dp)
-                                .height(200.dp)
-                                .clip(RoundedCornerShape(8.dp))
-                                .clickable {
-                                    onMovieClick(movie)
-                                },
-                            placeholder = ColorPainter(Color.Gray),
-                            contentScale = ContentScale.Crop
+                items(3) {
+                    AsyncImage(
+                        model = randomImage,
+                        contentDescription = null,
+                        Modifier
+                            .size(50.dp)
+                            .clip(CircleShape),
+                        placeholder = ColorPainter(Color.Gray),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+                item {
+                    Box(
+                        modifier = Modifier
+                            .size(50.dp)
+                            .border(
+                                2.dp, Color.White,
+                                shape = CircleShape
+                            )
+                            .clip(CircleShape)
+                    ) {
+                        Icon(
+                            Icons.Default.MoreHoriz,
+                            contentDescription = "Mais atores",
+                            Modifier.align(Center)
                         )
                     }
                 }
             }
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    text = LoremIpsum(3).values.first().toString(),
+                    Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    items(uiState.suggestedMovies) { suggestedMovie ->
+                        Box {
+                            AsyncImage(
+                                model = suggestedMovie.image,
+                                contentDescription = null,
+                                Modifier
+                                    .width(150.dp)
+                                    .height(200.dp)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .clickable {
+                                        onMovieClick(suggestedMovie)
+                                    },
+                                placeholder = ColorPainter(Color.Gray),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    } ?: Box(Modifier.fillMaxSize()) {
+        CircularProgressIndicator(Modifier.align(Center))
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MovieDetailsScreenWithMovieAddedToFavoriteListPreview() {
+    AnyFlixTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            MovieDetailsScreen(
+                uiState = MovieDetailsUiState(
+                    movie = sampleMovies.random(),
+                    isMovieAddedToFavoriteList = true
+                ),
+                onMovieClick = {},
+                onAddToMyListClick = {},
+                onRemoveFromMyList = {}
+            )
         }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun MovieDetailsScreenPreview() {
+fun MovieDetailsScreenWithoutMovieAddedToFavoriteListPreview() {
     AnyFlixTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             MovieDetailsScreen(
-                sampleMovies.random(),
+                uiState = MovieDetailsUiState(
+                    movie = sampleMovies.random(),
+                    isMovieAddedToFavoriteList = false
+                ),
                 onMovieClick = {},
-                onAddToMyListClick = {}
+                onAddToMyListClick = {},
+                onRemoveFromMyList = {}
             )
         }
     }
 }
+
+@Preview(showBackground = true)
+@Composable
+fun MovieDetailsScreenWithoutMoviePreview() {
+    AnyFlixTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            MovieDetailsScreen(
+                uiState = MovieDetailsUiState(
+                    movie = null
+                ),
+                onMovieClick = {},
+                onAddToMyListClick = {},
+                onRemoveFromMyList = {}
+            )
+        }
+    }
+}
+
