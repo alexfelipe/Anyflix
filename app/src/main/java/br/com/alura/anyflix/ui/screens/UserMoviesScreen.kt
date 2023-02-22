@@ -38,7 +38,7 @@ import br.com.alura.anyflix.ui.theme.AnyFlixTheme
 import coil.compose.AsyncImage
 
 @Composable
-fun UserMoviesScreen(
+fun MyListScreen(
     movies: List<Movie>,
     onSeeOtherMovies: () -> Unit,
     modifier: Modifier = Modifier,
@@ -66,7 +66,7 @@ fun UserMoviesScreen(
     } else {
         Column {
             Text(
-                text = "My favorite movies",
+                text = "My list",
                 Modifier.padding(16.dp),
                 style = MaterialTheme.typography.titleLarge
             )
@@ -128,7 +128,7 @@ fun UserMoviesScreen(
 fun UserMoviesScreenPreview() {
     AnyFlixTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
-            UserMoviesScreen(
+            MyListScreen(
                 sampleMovies,
                 onSeeOtherMovies = {},
                 onRemoveMovieFromMyList = {},
@@ -143,7 +143,7 @@ fun UserMoviesScreenPreview() {
 fun UserMoviesScreenWithoutMoviesPreview() {
     AnyFlixTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
-            UserMoviesScreen(
+            MyListScreen(
                 movies = emptyList(),
                 onSeeOtherMovies = {},
                 onRemoveMovieFromMyList = {},

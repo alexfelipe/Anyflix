@@ -3,7 +3,6 @@ package br.com.alura.anyflix.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -123,19 +122,20 @@ fun MovieDetailsScreen(
                 ) {
                     Column(
                         Modifier
-                            .padding(8.dp)
                             .widthIn(50.dp)
+                            .clip(RoundedCornerShape(15))
                             .clickable {
-                                if(uiState.isMovieAddedToFavoriteList) {
+                                if (uiState.isMovieAddedToMyList) {
                                     onRemoveFromMyList(movie)
                                 } else {
                                     onAddToMyListClick(movie)
                                 }
-                            },
+                            }
+                            .padding(8.dp),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        val (icon, message) = if (uiState.isMovieAddedToFavoriteList) {
+                        val (icon, message) = if (uiState.isMovieAddedToMyList) {
                             Pair(Icons.Default.Done, "Added")
                         } else {
                             Pair(Icons.Default.Add, "Add to my list")
@@ -267,13 +267,13 @@ fun MovieDetailsScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun MovieDetailsScreenWithMovieAddedToFavoriteListPreview() {
+fun MovieDetailsScreenWithMovieAddedToMyListPreview() {
     AnyFlixTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             MovieDetailsScreen(
                 uiState = MovieDetailsUiState(
                     movie = sampleMovies.random(),
-                    isMovieAddedToFavoriteList = true
+                    isMovieAddedToMyList = true
                 ),
                 onMovieClick = {},
                 onAddToMyListClick = {},
@@ -285,13 +285,13 @@ fun MovieDetailsScreenWithMovieAddedToFavoriteListPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun MovieDetailsScreenWithoutMovieAddedToFavoriteListPreview() {
+fun MovieDetailsScreenWithoutMovieAddedToMyListPreview() {
     AnyFlixTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             MovieDetailsScreen(
                 uiState = MovieDetailsUiState(
                     movie = sampleMovies.random(),
-                    isMovieAddedToFavoriteList = false
+                    isMovieAddedToMyList = false
                 ),
                 onMovieClick = {},
                 onAddToMyListClick = {},

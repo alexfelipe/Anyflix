@@ -9,25 +9,25 @@ import kotlinx.coroutines.flow.update
 
 class MovieDao {
 
-    val favoriteMovies = _favoriteMovies
+    val myList = _myList
         .map { it.toList() }
     val movies =
         _movies.asStateFlow()
 
-    fun addToFavoriteMovies(movie: Movie) {
-        _favoriteMovies.update {
+    fun addToMyList(movie: Movie) {
+        _myList.update {
             it + movie
         }
     }
 
-    fun removeFromFavoriteMovies(movie: Movie) {
-        _favoriteMovies.update {
+    fun removeFromMyList(movie: Movie) {
+        _myList.update {
             it - movie
         }
     }
 
     companion object {
-        private val _favoriteMovies = MutableStateFlow<Set<Movie>>(emptySet())
+        private val _myList = MutableStateFlow<Set<Movie>>(emptySet())
         private val _movies = MutableStateFlow(sampleMovies)
     }
 

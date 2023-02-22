@@ -29,21 +29,21 @@ fun NavGraphBuilder.movieDetailsScreen(
             val dao = remember {
                 MovieDao()
             }
-            val favoriteMovies by dao.favoriteMovies.collectAsState(emptyList())
+            val myList by dao.myList.collectAsState(emptyList())
             val movies by dao.movies.collectAsState()
             val suggestedMovies = remember(movie) {
                 movies.shuffled().take(10)
             }
-            val isMovieAddedToFavoriteList = remember(favoriteMovies) {
-                favoriteMovies.contains(movie)
+            val isMovieAddedToMyList = remember(myList) {
+                myList.contains(movie)
             }
             val uiState = remember(
                 suggestedMovies,
-                isMovieAddedToFavoriteList
+                isMovieAddedToMyList
             ) {
                 MovieDetailsUiState(
                     movie = movie,
-                    isMovieAddedToFavoriteList = isMovieAddedToFavoriteList,
+                    isMovieAddedToMyList = isMovieAddedToMyList,
                     suggestedMovies = suggestedMovies
                 )
             }
@@ -51,10 +51,10 @@ fun NavGraphBuilder.movieDetailsScreen(
                 uiState = uiState,
                 onMovieClick = onNavigateToMovieDetails,
                 onAddToMyListClick = {
-                    dao.addToFavoriteMovies(it)
+                    dao.addToMyList(it)
                 },
                 onRemoveFromMyList = {
-                    dao.removeFromFavoriteMovies(it)
+                    dao.removeFromMyList(it)
                 }
             )
         } ?: LaunchedEffect(null) {

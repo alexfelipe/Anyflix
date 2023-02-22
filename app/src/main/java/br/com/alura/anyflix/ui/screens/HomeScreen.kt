@@ -41,7 +41,7 @@ import coil.compose.AsyncImage
 
 @Composable
 fun HomeScreen(
-    favoriteMovies: List<Movie>,
+    myList: List<Movie>,
     onMovieClick: (Movie) -> Unit = {},
     onProfileMenuClick: () -> Unit = {},
     onMyListClick: () -> Unit = {}
@@ -79,7 +79,7 @@ fun HomeScreen(
                     onMyListClick = onMyListClick
                 )
             }
-            if (favoriteMovies.isNotEmpty()) {
+            if (myList.isNotEmpty()) {
                 item {
                     val title = "My list"
                     Column {
@@ -100,7 +100,7 @@ fun HomeScreen(
                                 vertical = 8.dp
                             )
                         ) {
-                            items(favoriteMovies) { movie ->
+                            items(myList) { movie ->
                                 Box {
                                     AsyncImage(
                                         model = movie.image,

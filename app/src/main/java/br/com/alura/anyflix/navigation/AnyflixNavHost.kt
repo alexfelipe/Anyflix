@@ -29,7 +29,7 @@ fun AnyflixNavHost(
                 navController.popBackStack()
             }
         )
-        userMoviesScreen(
+        myListScreen(
             onNavigateToUserMovies = {
                 navController.navigateToHome()
             },

@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -75,14 +76,17 @@ fun AnyflixMainBanner(
                 .padding(8.dp)
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Column(
                 Modifier
                     .widthIn(50.dp)
+                    .clip(RoundedCornerShape(15))
                     .clickable {
                         onMyListClick()
-                    },
+                    }
+                    .padding(8.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -112,7 +116,9 @@ fun AnyflixMainBanner(
                 )
             }
             Column(
-                Modifier.widthIn(50.dp),
+                Modifier
+                    .widthIn(50.dp)
+                    .padding(8.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
