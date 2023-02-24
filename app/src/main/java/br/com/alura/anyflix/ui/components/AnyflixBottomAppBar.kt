@@ -1,59 +1,64 @@
 package br.com.alura.anyflix.ui.components
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import br.com.alura.anyflix.ui.theme.AnyFlixTheme
 
-sealed class BottomAppBarItem(val icon: ImageVector) {
-    object Search : BottomAppBarItem(Icons.Default.Search)
-    object Download : BottomAppBarItem(Icons.Default.Download)
-    object Play : BottomAppBarItem(Icons.Default.PlayArrow)
-    object Menu : BottomAppBarItem(Icons.Default.Menu)
+sealed class BottomAppBarItem(
+    val icon: ImageVector,
+    val label: String
+) {
+    object Home : BottomAppBarItem(
+        Icons.Default.Home,
+        "Início"
+    )
+    object MyList : BottomAppBarItem(
+        Icons.Default.List,
+        "Minha lista"
+    )
 }
 
 @Composable
 fun AnyflixBottomAppBar(
+    selectedItem: BottomAppBarItem,
+    items: List<BottomAppBarItem>,
     modifier: Modifier = Modifier,
-    items: List<BottomAppBarItem> = listOf(
-        BottomAppBarItem.Search,
-        BottomAppBarItem.Download,
-        BottomAppBarItem.Play,
-        BottomAppBarItem.Menu
-    ),
     onItemClick: (BottomAppBarItem) -> Unit = {},
 ) {
     BottomAppBar(
         modifier,
-        containerColor = Color.Transparent,
+        containerColor = MaterialTheme.colorScheme.background
     ) {
         items.forEach {
             NavigationBarItem(
-                selected = false,
-                onClick = {
-                    onItemClick(it)
-                },
+                selected = it == selectedItem,
+                onClick = { onItemClick(it) },
                 icon = {
-                    Icon(
-                        it.icon, contentDescription = null,
-                        tint = Color.White
-                    )
+                    Column {
+                        Icon(
+                            it.icon,
+                            contentDescription = null
+                        )
+                    }
+                },
+                label = {
+                    Text(text = it.label)
                 }
             )
         }
     }
-
 }
 
 @Preview
@@ -61,7 +66,13 @@ fun AnyflixBottomAppBar(
 fun AnyflixBottomAppBarPreview() {
     AnyFlixTheme {
         Surface {
-            AnyflixBottomAppBar()
+            AnyflixBottomAppBar(
+                selectedItem = BottomAppBarItem.Home,
+                items = listOf(
+                    BottomAppBarItem.Home,
+                    BottomAppBarItem.MyList
+                )
+            )
         }
     }
 }

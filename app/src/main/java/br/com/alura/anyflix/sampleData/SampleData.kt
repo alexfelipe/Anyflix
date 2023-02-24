@@ -15,10 +15,25 @@ val randomImage
 val randomTitle
     get() = LoremIpsum(Random.nextInt(1, 3)).values
         .first().toString()
+val randomYear
+    get() =
+        Random.nextInt(1980, 2023)
+val randomPlot
+    get() = LoremIpsum(Random.nextInt(5, 10)).values
+        .first().toString()
+
 
 val sampleMovies = List(15) {
     Movie(
         title = randomTitle,
-        image = randomImage
+        image = randomImage,
+        year = randomYear,
+        plot = randomPlot
     )
 }
+
+val sampleMovieSections = mapOf(
+    "Em alta" to sampleMovies.shuffled().take(7),
+    "Novidades" to sampleMovies.shuffled().take(7),
+    "Continue assistindo" to sampleMovies.shuffled().take(7)
+)

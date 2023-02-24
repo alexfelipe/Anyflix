@@ -6,6 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import br.com.alura.anyflix.dao.MovieDao
 import br.com.alura.anyflix.model.Movie
@@ -15,13 +16,13 @@ import br.com.alura.anyflix.ui.uistates.MovieDetailsUiState
 
 internal const val movieDetailsRoute = "movieDetails"
 private const val movieIdArgument = "movieId"
+internal const val movieDetailsRouteFullpath = "$movieDetailsRoute/{$movieIdArgument}"
 
 fun NavGraphBuilder.movieDetailsScreen(
     onNavigateToMovieDetails: (Movie) -> Unit,
     onPopBackStack: () -> Unit,
 ) {
-    composable("$movieDetailsRoute/{$movieIdArgument}") { backStackEntry ->
-
+    composable(movieDetailsRouteFullpath) { backStackEntry ->
         val movieId = backStackEntry.arguments?.getString(movieIdArgument)
         sampleMovies.find { movie ->
             movie.id == movieId
@@ -63,6 +64,9 @@ fun NavGraphBuilder.movieDetailsScreen(
     }
 }
 
-fun NavController.navigateToMovieDetails(id: String) {
-    navigate("$movieDetailsRoute/$id")
+fun NavController.navigateToMovieDetails(
+    id: String,
+    navOptions: NavOptions? = null
+) {
+    navigate("$movieDetailsRoute/$id", navOptions)
 }

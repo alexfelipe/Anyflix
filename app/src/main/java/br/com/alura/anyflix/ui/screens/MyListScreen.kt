@@ -10,9 +10,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -45,6 +45,13 @@ fun MyListScreen(
     onMovieClick: (Movie) -> Unit,
     onRemoveMovieFromMyList: (Movie) -> Unit
 ) {
+    val columns = if(movies.size < 4) {
+        1
+    } else if (movies.size < 6) {
+        2
+    } else {
+        3
+    }
     if (movies.isEmpty()) {
         Box(
             Modifier.fillMaxSize()
@@ -55,26 +62,23 @@ fun MyListScreen(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "Sem filmes favoritados",
+                    text = "Sem filmes na sua lista",
                     style = MaterialTheme.typography.titleLarge
                 )
                 TextButton(onClick = onSeeOtherMovies) {
-                    Text(text = "Ver outros filmes")
+                    Text(text = "Adicionar novos filmes")
                 }
             }
         }
     } else {
         Column {
-            Text(
-                text = "My list",
-                Modifier.padding(16.dp),
-                style = MaterialTheme.typography.titleLarge
-            )
-            LazyColumn(
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(columns),
                 modifier
                     .fillMaxSize(),
                 contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 items(movies) { movie ->
                     Column(
@@ -90,12 +94,12 @@ fun MyListScreen(
                         Box {
                             Box(
                                 Modifier
-                                    .padding(16.dp)
-                                    .size(50.dp)
+                                    .padding(8.dp)
                                     .background(
                                         color = Color.Black.copy(alpha = 0.5f),
                                         shape = CircleShape
                                     )
+                                    .padding(4.dp)
                                     .align(Alignment.TopEnd)
                                     .clickable { onRemoveMovieFromMyList(movie) }
                             ) {
@@ -125,7 +129,7 @@ fun MyListScreen(
 
 @Preview
 @Composable
-fun UserMoviesScreenPreview() {
+fun MyListScreenPreview() {
     AnyFlixTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             MyListScreen(
@@ -140,7 +144,7 @@ fun UserMoviesScreenPreview() {
 
 @Preview
 @Composable
-fun UserMoviesScreenWithoutMoviesPreview() {
+fun MyListScreenWithoutMoviesPreview() {
     AnyFlixTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             MyListScreen(

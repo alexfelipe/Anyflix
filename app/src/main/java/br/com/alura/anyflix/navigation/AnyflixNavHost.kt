@@ -1,9 +1,11 @@
 package br.com.alura.anyflix.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navOptions
 
 @Composable
 fun AnyflixNavHost(
@@ -17,24 +19,38 @@ fun AnyflixNavHost(
             onNavigateToMovieDetails = { movie ->
                 navController.navigateToMovieDetails(movie.id)
             },
-            onNavigateToMyList = {
-                navController.navigateToUserMovies()
-            }
         )
         movieDetailsScreen(
             onNavigateToMovieDetails = { movie ->
-                navController.navigateToMovieDetails(movie.id)
+                navController.navigateToMovieDetails(movie.id,
+                    navOptions {
+                        popUpTo(movieDetailsRouteFullpath) {
+                            inclusive = true
+                        }
+                    }
+                )
             },
             onPopBackStack = {
                 navController.popBackStack()
             }
         )
         myListScreen(
-            onNavigateToUserMovies = {
-                navController.navigateToHome()
+            onNavigateToHome = {
+                navController.navigateToHome(navOptions {
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        inclusive = true
+                    }
+                })
             },
             onNavigateToMovieDetails = {
-                navController.navigateToMovieDetails(it.id)
+                navController.navigateToMovieDetails(
+                    it.id,
+                    navOptions {
+                        popUpTo(movieDetailsRouteFullpath) {
+                            inclusive = true
+                        }
+                    }
+                )
             }
         )
     }
