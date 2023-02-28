@@ -23,6 +23,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,22 +36,25 @@ import androidx.compose.ui.zIndex
 import br.com.alura.anyflix.model.Movie
 import br.com.alura.anyflix.sampleData.sampleMovies
 import br.com.alura.anyflix.ui.theme.AnyFlixTheme
+import br.com.alura.anyflix.ui.uistates.MyListUiState
 import coil.compose.AsyncImage
 
 @Composable
 fun MyListScreen(
-    movies: List<Movie>,
+    uiState: MyListUiState,
     onSeeOtherMovies: () -> Unit,
     modifier: Modifier = Modifier,
     onMovieClick: (Movie) -> Unit,
     onRemoveMovieFromMyList: (Movie) -> Unit
 ) {
-    val columns = if(movies.size < 4) {
-        1
-    } else if (movies.size < 6) {
-        2
-    } else {
-        3
+    val movies = uiState.movies
+    val size = movies.size
+    val columns = remember(size) {
+        when {
+            size < 4 -> 1
+            size < 6 -> 2
+            else -> 3
+        }
     }
     if (movies.isEmpty()) {
         Box(
@@ -104,7 +108,9 @@ fun MyListScreen(
                                     .clickable { onRemoveMovieFromMyList(movie) }
                             ) {
                                 Icon(
-                                    Icons.Default.Close, contentDescription = null, Modifier.align(
+                                    Icons.Default.Close,
+                                    contentDescription = null,
+                                    Modifier.align(
                                         Alignment.Center
                                     )
                                 )
@@ -133,7 +139,7 @@ fun MyListScreenPreview() {
     AnyFlixTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             MyListScreen(
-                sampleMovies,
+                uiState = MyListUiState(sampleMovies),
                 onSeeOtherMovies = {},
                 onRemoveMovieFromMyList = {},
                 onMovieClick = {}
@@ -148,7 +154,7 @@ fun MyListScreenWithoutMoviesPreview() {
     AnyFlixTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             MyListScreen(
-                movies = emptyList(),
+                uiState = MyListUiState(emptyList()),
                 onSeeOtherMovies = {},
                 onRemoveMovieFromMyList = {},
                 onMovieClick = {}

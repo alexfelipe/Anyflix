@@ -3,19 +3,19 @@ package br.com.alura.anyflix.navigation
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import br.com.alura.anyflix.dao.MovieDao
 import br.com.alura.anyflix.model.Movie
-import br.com.alura.anyflix.sampleData.sampleMovies
 import br.com.alura.anyflix.ui.screens.MovieDetailsScreen
-import br.com.alura.anyflix.ui.uistates.MovieDetailsUiState
+import br.com.alura.anyflix.ui.viewmodels.MovieDetailsViewModel
+import kotlinx.coroutines.launch
 
 internal const val movieDetailsRoute = "movieDetails"
-private const val movieIdArgument = "movieId"
+internal const val movieIdArgument = "movieId"
 internal const val movieDetailsRouteFullpath = "$movieDetailsRoute/{$movieIdArgument}"
 
 fun NavGraphBuilder.movieDetailsScreen(
@@ -23,39 +23,25 @@ fun NavGraphBuilder.movieDetailsScreen(
     onPopBackStack: () -> Unit,
 ) {
     composable(movieDetailsRouteFullpath) { backStackEntry ->
-        val movieId = backStackEntry.arguments?.getString(movieIdArgument)
-        sampleMovies.find { movie ->
-            movie.id == movieId
-        }?.let { movie ->
-            val dao = remember {
-                MovieDao()
-            }
-            val myList by dao.myList.collectAsState(emptyList())
-            val movies by dao.movies.collectAsState()
-            val suggestedMovies = remember(movie) {
-                movies.shuffled().take(10)
-            }
-            val isMovieAddedToMyList = remember(myList) {
-                myList.contains(movie)
-            }
-            val uiState = remember(
-                suggestedMovies,
-                isMovieAddedToMyList
-            ) {
-                MovieDetailsUiState(
-                    movie = movie,
-                    isMovieAddedToMyList = isMovieAddedToMyList,
-                    suggestedMovies = suggestedMovies
-                )
-            }
+        backStackEntry.arguments?.getString(movieIdArgument)?.let {
+            val viewModel = hiltViewModel<MovieDetailsViewModel>()
+            val uiState by viewModel.uiState.collectAsState()
+            val scope = rememberCoroutineScope()
             MovieDetailsScreen(
                 uiState = uiState,
                 onMovieClick = onNavigateToMovieDetails,
                 onAddToMyListClick = {
-                    dao.addToMyList(it)
+                    scope.launch {
+                        viewModel.addToMyList(it)
+                    }
                 },
                 onRemoveFromMyList = {
-                    dao.removeFromMyList(it)
+                    scope.launch {
+                        viewModel.removeFromMyList(it)
+                    }
+                },
+                onRetryLoadMovie = {
+                    viewModel.loadMovie()
                 }
             )
         } ?: LaunchedEffect(null) {

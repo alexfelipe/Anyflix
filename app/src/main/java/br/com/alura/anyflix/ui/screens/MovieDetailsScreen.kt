@@ -26,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -36,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import br.com.alura.anyflix.model.Movie
@@ -57,6 +59,7 @@ fun MovieDetailsScreen(
     onMovieClick: (Movie) -> Unit,
     onAddToMyListClick: (Movie) -> Unit,
     onRemoveFromMyList: (Movie) -> Unit,
+    onRetryLoadMovie: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -64,42 +67,66 @@ fun MovieDetailsScreen(
             .fillMaxSize()
             .background(Color(0xFF2B2B2B))
     ) {
-        uiState.movie?.let { movie ->
-            Column {
+        when (uiState) {
+            MovieDetailsUiState.Failure -> {
                 Column(
-                    Modifier
-                        .padding(horizontal = 24.dp, vertical = 36.dp)
-                        .fillMaxWidth()
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        AsyncImage(
-                            model = movie.image,
-                            contentDescription = null,
-                            Modifier
-                                .size(
-                                    height = 152.dp,
-                                    width = 100.dp
-                                )
-                                .clip(shape = RoundedCornerShape(4.dp)),
-                            placeholder = ColorPainter(Color.Gray),
-                            contentScale = ContentScale.Crop
+                    Text(
+                        text = "Falha ao carregar o filme", style = TextStyle.Default.copy(
+                            fontSize = MaterialTheme.typography.titleLarge.fontSize
                         )
-                        Column {
-                            Text(text = movie.title)
-                            Text(text = movie.year.toString())
-                            Text(text = movie.plot)
-                        }
+                    )
+                    TextButton(onClick = { onRetryLoadMovie() }) {
+                        Text(text = "Tentar buscar novamente")
                     }
-                    Spacer(modifier = Modifier.size(24.dp))
-                    Row {
-                        Column(
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
+                }
+            }
+
+            MovieDetailsUiState.Loading -> {
+                Box(Modifier.fillMaxSize()) {
+                    CircularProgressIndicator(Modifier.align(Center))
+                }
+            }
+
+            is MovieDetailsUiState.Success -> {
+                val movie = uiState.movie
+                Column {
+                    Column(
+                        Modifier
+                            .padding(horizontal = 24.dp, vertical = 36.dp)
+                            .fillMaxWidth()
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                            val toggleButton = remember(uiState.isMovieAddedToMyList) {
-                                if (uiState.isMovieAddedToMyList) {
+                            AsyncImage(
+                                model = movie.image,
+                                contentDescription = null,
+                                Modifier
+                                    .size(
+                                        height = 152.dp,
+                                        width = 100.dp
+                                    )
+                                    .clip(shape = RoundedCornerShape(4.dp)),
+                                placeholder = ColorPainter(Color.Gray),
+                                contentScale = ContentScale.Crop
+                            )
+                            Column {
+                                Text(text = movie.title)
+                                Text(text = movie.year.toString())
+                                Text(text = movie.plot)
+                            }
+                        }
+                        Spacer(modifier = Modifier.size(24.dp))
+                        Row {
+                            Column(
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                val toggleButton = if (uiState.movie.inMyList) {
                                     ToggleButton(
                                         icon = Icons.Default.PlaylistRemove,
                                         text = "Remover da lista",
@@ -114,77 +141,76 @@ fun MovieDetailsScreen(
                                         buttonColor = 0xff4F4F4F
                                     )
                                 }
-                            }
-                            Box(modifier = Modifier.fillMaxWidth()) {
-                                Box(
-                                    Modifier
-                                        .padding(8.dp)
-                                        .fillMaxWidth()
-                                        .background(
-                                            Color(toggleButton.buttonColor),
-                                            shape = CircleShape
-                                        )
-                                        .align(Center)
-                                        .clip(CircleShape)
-                                        .clickable {
-                                            toggleButton.action(movie)
-                                        }
-                                        .padding(8.dp)
-                                ) {
-                                    Row(
-                                        Modifier.align(Center),
-                                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                                        verticalAlignment = Alignment.CenterVertically
+                                Box(modifier = Modifier.fillMaxWidth()) {
+                                    Box(
+                                        Modifier
+                                            .padding(8.dp)
+                                            .fillMaxWidth()
+                                            .background(
+                                                Color(toggleButton.buttonColor),
+                                                shape = CircleShape
+                                            )
+                                            .align(Center)
+                                            .clip(CircleShape)
+                                            .clickable {
+                                                toggleButton.action(movie)
+                                            }
+                                            .padding(8.dp)
                                     ) {
-                                        Icon(
-                                            toggleButton.icon,
-                                            contentDescription = null,
-                                            Modifier
-                                                .size(32.dp)
-                                        )
-                                        Text(text = toggleButton.text)
+                                        Row(
+                                            Modifier.align(Center),
+                                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Icon(
+                                                toggleButton.icon,
+                                                contentDescription = null,
+                                                Modifier
+                                                    .size(32.dp)
+                                            )
+                                            Text(text = toggleButton.text)
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                }
-                Text(
-                    text = "Você também pode se interessar por...",
-                    Modifier.padding(
-                        horizontal = 16.dp,
-                        vertical = 8.dp
-                    )
-                )
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    contentPadding = PaddingValues(
-                        horizontal = 16.dp,
-                        vertical = 8.dp
-                    )
-                ) {
-                    items(uiState.suggestedMovies) { movie ->
-                        Box {
-                            AsyncImage(
-                                model = movie.image,
-                                contentDescription = null,
-                                Modifier
-                                    .width(100.dp)
-                                    .height(150.dp)
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .clickable {
-                                        onMovieClick(movie)
-                                    },
-                                placeholder = ColorPainter(Color.Gray),
-                                contentScale = ContentScale.Crop
+                    if (uiState.suggestedMovies.isNotEmpty()) {
+                        Text(
+                            text = "Você também pode se interessar por...",
+                            Modifier.padding(
+                                horizontal = 16.dp,
+                                vertical = 8.dp
                             )
+                        )
+                        LazyRow(
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                            contentPadding = PaddingValues(
+                                horizontal = 16.dp,
+                                vertical = 8.dp
+                            )
+                        ) {
+                            items(uiState.suggestedMovies) { movie ->
+                                Box {
+                                    AsyncImage(
+                                        model = movie.image,
+                                        contentDescription = null,
+                                        Modifier
+                                            .width(100.dp)
+                                            .height(150.dp)
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .clickable {
+                                                onMovieClick(movie)
+                                            },
+                                        placeholder = ColorPainter(Color.Gray),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                }
+                            }
                         }
                     }
                 }
-
             }
-        } ?: Box(Modifier.fillMaxSize()) {
-            CircularProgressIndicator(Modifier.align(Center))
         }
     }
 }
@@ -195,13 +221,13 @@ fun MovieDetailsScreenWithMovieAddedToMyListPreview() {
     AnyFlixTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             MovieDetailsScreen(
-                uiState = MovieDetailsUiState(
+                uiState = MovieDetailsUiState.Success(
                     movie = sampleMovies.random(),
-                    isMovieAddedToMyList = true
                 ),
                 onMovieClick = {},
                 onAddToMyListClick = {},
-                onRemoveFromMyList = {}
+                onRemoveFromMyList = {},
+                onRetryLoadMovie = {}
             )
         }
     }
@@ -213,13 +239,13 @@ fun MovieDetailsScreenWithoutMovieAddedToMyListPreview() {
     AnyFlixTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             MovieDetailsScreen(
-                uiState = MovieDetailsUiState(
+                uiState = MovieDetailsUiState.Success(
                     movie = sampleMovies.random(),
-                    isMovieAddedToMyList = false
                 ),
                 onMovieClick = {},
                 onAddToMyListClick = {},
-                onRemoveFromMyList = {}
+                onRemoveFromMyList = {},
+                onRetryLoadMovie = {}
             )
         }
     }
@@ -231,12 +257,11 @@ fun MovieDetailsScreenWithoutMoviePreview() {
     AnyFlixTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             MovieDetailsScreen(
-                uiState = MovieDetailsUiState(
-                    movie = null
-                ),
+                uiState = MovieDetailsUiState.Failure,
                 onMovieClick = {},
                 onAddToMyListClick = {},
-                onRemoveFromMyList = {}
+                onRemoveFromMyList = {},
+                onRetryLoadMovie = {}
             )
         }
     }
@@ -248,13 +273,14 @@ fun MovieDetailsScreenWithSuggestedMoviesPreview() {
     AnyFlixTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             MovieDetailsScreen(
-                uiState = MovieDetailsUiState(
+                uiState = MovieDetailsUiState.Success(
                     movie = sampleMovies.random(),
                     suggestedMovies = sampleMovies.shuffled()
                 ),
                 onMovieClick = {},
                 onAddToMyListClick = {},
-                onRemoveFromMyList = {}
+                onRemoveFromMyList = {},
+                onRetryLoadMovie = {}
             )
         }
     }

@@ -5,10 +5,10 @@ import br.com.alura.anyflix.model.Movie
 import kotlin.random.Random
 
 val randomImage
-    get() = "https://picsum.photos/${Random.nextInt(1380, 1920)}/${
+    get() = "https://picsum.photos/${Random.nextInt(1920, 2560)}/${
         Random.nextInt(
-            720,
-            1080
+            1080,
+            1440
         )
     }"
 

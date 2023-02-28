@@ -2,8 +2,14 @@ package br.com.alura.anyflix.ui.uistates
 
 import br.com.alura.anyflix.model.Movie
 
-data class MovieDetailsUiState(
-    val movie: Movie? = null,
-    val isMovieAddedToMyList: Boolean = false,
-    val suggestedMovies: List<Movie> = emptyList()
-)
+sealed class MovieDetailsUiState {
+
+    object Loading : MovieDetailsUiState()
+
+    object Failure : MovieDetailsUiState()
+
+    data class Success(
+        val movie: Movie,
+        val suggestedMovies: List<Movie> = emptyList()
+    ) : MovieDetailsUiState()
+}

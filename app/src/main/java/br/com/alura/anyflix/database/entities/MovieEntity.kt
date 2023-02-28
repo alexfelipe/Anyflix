@@ -1,11 +1,13 @@
-package br.com.alura.anyflix.model
+package br.com.alura.anyflix.database.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import br.com.alura.anyflix.database.entities.MovieEntity
+import br.com.alura.anyflix.model.Movie
 import java.util.UUID
 
-data class Movie(
+@Entity(tableName = "movies")
+class MovieEntity(
+    @PrimaryKey
     val id: String = UUID.randomUUID().toString(),
     val title: String,
     val year: Int,
@@ -14,7 +16,7 @@ data class Movie(
     val inMyList: Boolean = false
 )
 
-fun Movie.toMovieEntity() = MovieEntity(
+fun MovieEntity.toMovie() = Movie(
     id = id,
     title = title,
     year = year,

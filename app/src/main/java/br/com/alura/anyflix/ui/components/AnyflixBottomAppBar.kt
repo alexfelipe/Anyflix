@@ -8,6 +8,7 @@ import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -15,6 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import br.com.alura.anyflix.ui.theme.AnyFlixTheme
+import br.com.alura.anyflix.ui.theme.unselectedIconBottomAppBarColor
+import br.com.alura.anyflix.ui.theme.unselectedTextBottomAppBarColor
 
 sealed class BottomAppBarItem(
     val icon: ImageVector,
@@ -24,6 +27,7 @@ sealed class BottomAppBarItem(
         Icons.Default.Home,
         "Início"
     )
+
     object MyList : BottomAppBarItem(
         Icons.Default.List,
         "Minha lista"
@@ -39,7 +43,7 @@ fun AnyflixBottomAppBar(
 ) {
     BottomAppBar(
         modifier,
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = MaterialTheme.colorScheme.background,
     ) {
         items.forEach {
             NavigationBarItem(
@@ -55,7 +59,13 @@ fun AnyflixBottomAppBar(
                 },
                 label = {
                     Text(text = it.label)
-                }
+                },
+                colors = NavigationBarItemDefaults.colors(
+                    indicatorColor = MaterialTheme.colorScheme.onBackground,
+                    selectedTextColor = MaterialTheme.colorScheme.onBackground,
+                    unselectedIconColor = unselectedIconBottomAppBarColor,
+                    unselectedTextColor = unselectedTextBottomAppBarColor
+                )
             )
         }
     }

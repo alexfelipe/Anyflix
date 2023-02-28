@@ -31,19 +31,18 @@ import br.com.alura.anyflix.sampleData.sampleMovieSections
 import br.com.alura.anyflix.sampleData.sampleMovies
 import br.com.alura.anyflix.ui.components.AnyflixMainBanner
 import br.com.alura.anyflix.ui.theme.AnyFlixTheme
+import br.com.alura.anyflix.ui.uistates.HomeUiState
 import coil.compose.AsyncImage
 
 @Composable
 fun HomeScreen(
+    uiState: HomeUiState,
     modifier: Modifier = Modifier,
     onMovieClick: (Movie) -> Unit = {},
 ) {
+    val sections = uiState.sections
     Box(modifier) {
-        LazyColumn(
-            contentPadding = PaddingValues(
-                bottom = 80.dp
-            )
-        ) {
+        LazyColumn {
             item {
                 val movie = remember {
                     sampleMovies.random()
@@ -54,7 +53,7 @@ fun HomeScreen(
                     onMovieClick = onMovieClick,
                 )
             }
-            sampleMovieSections.forEach {
+            sections.forEach {
                 val title = it.key
                 val movies = it.value
                 item {
@@ -77,21 +76,19 @@ fun HomeScreen(
                             )
                         ) {
                             items(movies) { movie ->
-                                Box {
-                                    AsyncImage(
-                                        model = movie.image,
-                                        contentDescription = null,
-                                        Modifier
-                                            .width(150.dp)
-                                            .height(200.dp)
-                                            .clip(RoundedCornerShape(8.dp))
-                                            .clickable {
-                                                onMovieClick(movie)
-                                            },
-                                        placeholder = ColorPainter(Color.Gray),
-                                        contentScale = ContentScale.Crop
-                                    )
-                                }
+                                AsyncImage(
+                                    model = movie.image,
+                                    contentDescription = null,
+                                    Modifier
+                                        .width(150.dp)
+                                        .height(200.dp)
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .clickable {
+                                            onMovieClick(movie)
+                                        },
+                                    placeholder = ColorPainter(Color.Gray),
+                                    contentScale = ContentScale.Crop
+                                )
                             }
                         }
                     }
@@ -106,7 +103,11 @@ fun HomeScreen(
 fun HomeScreenPreview() {
     AnyFlixTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
-            HomeScreen()
+            HomeScreen(
+                uiState = HomeUiState(
+                    sections = sampleMovieSections
+                )
+            )
         }
     }
 }
