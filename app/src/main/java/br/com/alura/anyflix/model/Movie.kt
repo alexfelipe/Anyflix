@@ -1,8 +1,7 @@
 package br.com.alura.anyflix.model
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 import br.com.alura.anyflix.database.entities.MovieEntity
+import br.com.alura.anyflix.network.MovieRequest
 import java.util.UUID
 
 data class Movie(
@@ -21,4 +20,9 @@ fun Movie.toMovieEntity() = MovieEntity(
     plot = plot,
     image = image,
     inMyList = inMyList
+)
+
+fun Movie.toMovieRequest() = MovieRequest(
+    title = title,
+    image = image
 )
