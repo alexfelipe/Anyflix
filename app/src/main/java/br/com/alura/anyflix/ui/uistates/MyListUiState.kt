@@ -2,6 +2,17 @@ package br.com.alura.anyflix.ui.uistates
 
 import br.com.alura.anyflix.model.Movie
 
-data class MyListUiState(
-    val movies: List<Movie> = emptyList()
-)
+
+sealed class MyListUiState() {
+
+    object Loading : MyListUiState()
+
+    object Failure : MyListUiState()
+
+    object Empty : MyListUiState()
+
+    data class Success(
+        val movies: List<Movie> = emptyList()
+    ) : MyListUiState()
+
+}

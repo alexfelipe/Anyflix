@@ -13,7 +13,7 @@ val randomImage
     }"
 
 val randomTitle
-    get() = LoremIpsum(Random.nextInt(1, 3)).values
+    get() = LoremIpsum(Random.nextInt(1, 5)).values
         .first().toString()
 val randomYear
     get() =
@@ -28,7 +28,8 @@ val sampleMovies = List(15) {
         title = randomTitle,
         image = randomImage,
         year = randomYear,
-        plot = randomPlot
+        plot = randomPlot,
+        inMyList = it % 2 == 0
     )
 }
 

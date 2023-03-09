@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -30,6 +31,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -43,94 +46,130 @@ import coil.compose.AsyncImage
 fun MyListScreen(
     uiState: MyListUiState,
     onSeeOtherMovies: () -> Unit,
-    modifier: Modifier = Modifier,
     onMovieClick: (Movie) -> Unit,
-    onRemoveMovieFromMyList: (Movie) -> Unit
+    onRemoveMovieFromMyList: (Movie) -> Unit,
+    onRetryLoadMyList: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    val movies = uiState.movies
-    val size = movies.size
-    val columns = remember(size) {
-        when {
-            size < 4 -> 1
-            size < 6 -> 2
-            else -> 3
-        }
-    }
-    if (movies.isEmpty()) {
-        Box(
-            Modifier.fillMaxSize()
-        ) {
+    when (uiState) {
+        MyListUiState.Failure -> {
             Column(
-                Modifier.align(Alignment.Center),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Sem filmes na sua lista",
-                    style = MaterialTheme.typography.titleLarge
+                    text = "Falha ao carregar a minha lista",
+                    style = TextStyle.Default.copy(
+                        fontSize = MaterialTheme.typography.titleLarge.fontSize
+                    )
                 )
-                TextButton(onClick = onSeeOtherMovies) {
-                    Text(text = "Adicionar novos filmes")
-                }
-            }
-        }
-    } else {
-        Column {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(columns),
-                modifier
-                    .fillMaxSize(),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                items(movies) { movie ->
-                    Column(
-                        Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)
-                            .clickable {
-                                onMovieClick(movie)
-                            },
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Text(text = movie.title)
-                        Box {
-                            Box(
-                                Modifier
-                                    .padding(8.dp)
-                                    .background(
-                                        color = Color.Black.copy(alpha = 0.5f),
-                                        shape = CircleShape
-                                    )
-                                    .padding(4.dp)
-                                    .align(Alignment.TopEnd)
-                                    .clickable { onRemoveMovieFromMyList(movie) }
-                            ) {
-                                Icon(
-                                    Icons.Default.Close,
-                                    contentDescription = null,
-                                    Modifier.align(
-                                        Alignment.Center
-                                    )
-                                )
-                            }
-                            AsyncImage(
-                                model = movie.image,
-                                contentDescription = null,
-                                Modifier
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .zIndex(-1f),
-                                placeholder = ColorPainter(Color.Gray),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
-                    }
+                TextButton(onClick = { onRetryLoadMyList() }) {
+                    Text(text = "Tentar buscar novamente")
                 }
             }
         }
 
+        MyListUiState.Loading -> {
+            Box(Modifier.fillMaxSize()) {
+                CircularProgressIndicator(
+                    Modifier.align(Alignment.Center)
+                )
+            }
+        }
+
+        is MyListUiState.Success -> {
+            val movies = uiState.movies
+            val size = movies.size
+            val columns = remember(size) {
+                when {
+                    size < 4 -> 1
+                    size < 6 -> 2
+                    else -> 3
+                }
+            }
+            Column {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(columns),
+                    modifier
+                        .fillMaxSize(),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    items(movies) { movie ->
+                        Column(
+                            Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                                .clickable {
+                                    onMovieClick(movie)
+                                },
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
+                                text = movie.title,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Box {
+                                Box(
+                                    Modifier
+                                        .padding(8.dp)
+                                        .background(
+                                            color = Color.Black.copy(alpha = 0.5f),
+                                            shape = CircleShape
+                                        )
+                                        .clip(CircleShape)
+                                        .align(Alignment.TopEnd)
+                                        .clickable { onRemoveMovieFromMyList(movie) }
+                                        .padding(4.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Default.Close,
+                                        contentDescription = null,
+                                        Modifier.align(
+                                            Alignment.Center
+                                        )
+                                    )
+                                }
+                                AsyncImage(
+                                    model = movie.image,
+                                    contentDescription = null,
+                                    Modifier
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .zIndex(-1f),
+                                    placeholder = ColorPainter(Color.Gray),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+        MyListUiState.Empty -> {
+            Box(
+                Modifier.fillMaxSize()
+            ) {
+                Column(
+                    Modifier.align(Alignment.Center),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "Sem filmes na sua lista",
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    TextButton(onClick = onSeeOtherMovies) {
+                        Text(text = "Adicionar novos filmes")
+                    }
+                }
+            }
+        }
     }
+
 }
 
 @Preview
@@ -139,10 +178,11 @@ fun MyListScreenPreview() {
     AnyFlixTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             MyListScreen(
-                uiState = MyListUiState(sampleMovies),
+                uiState = MyListUiState.Success(sampleMovies),
                 onSeeOtherMovies = {},
                 onRemoveMovieFromMyList = {},
-                onMovieClick = {}
+                onMovieClick = {},
+                onRetryLoadMyList = {}
             )
         }
     }
@@ -154,10 +194,27 @@ fun MyListScreenWithoutMoviesPreview() {
     AnyFlixTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             MyListScreen(
-                uiState = MyListUiState(emptyList()),
+                uiState = MyListUiState.Empty,
                 onSeeOtherMovies = {},
                 onRemoveMovieFromMyList = {},
-                onMovieClick = {}
+                onMovieClick = {},
+                onRetryLoadMyList = {}
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+fun MyListScreenWithFailurePreview(){
+    AnyFlixTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            MyListScreen(
+                uiState = MyListUiState.Failure,
+                onSeeOtherMovies = {},
+                onRemoveMovieFromMyList = {},
+                onMovieClick = {},
+                onRetryLoadMyList = {}
             )
         }
     }

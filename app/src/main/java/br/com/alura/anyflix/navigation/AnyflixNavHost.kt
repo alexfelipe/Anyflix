@@ -62,7 +62,6 @@ fun NavController.navigateToBottomAppBarItem(
                     launchSingleTop = true
                     popUpTo(homeRoute)
                 }
-
             )
         }
         BottomAppBarItem.MyList -> {

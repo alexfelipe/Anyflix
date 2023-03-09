@@ -3,7 +3,6 @@ package br.com.alura.anyflix.navigation
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -23,6 +22,9 @@ fun NavGraphBuilder.homeScreen(
         HomeScreen(
             uiState = uiState,
             onMovieClick = onNavigateToMovieDetails,
+            onRetryLoadSections = {
+                viewModel.loadSections()
+            }
         )
     }
 }

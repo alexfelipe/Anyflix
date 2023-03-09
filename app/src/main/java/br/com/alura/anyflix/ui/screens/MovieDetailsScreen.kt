@@ -87,7 +87,9 @@ fun MovieDetailsScreen(
 
             MovieDetailsUiState.Loading -> {
                 Box(Modifier.fillMaxSize()) {
-                    CircularProgressIndicator(Modifier.align(Center))
+                    CircularProgressIndicator(
+                        Modifier.align(Center)
+                    )
                 }
             }
 
@@ -240,7 +242,9 @@ fun MovieDetailsScreenWithoutMovieAddedToMyListPreview() {
         Surface(color = MaterialTheme.colorScheme.background) {
             MovieDetailsScreen(
                 uiState = MovieDetailsUiState.Success(
-                    movie = sampleMovies.random(),
+                    movie = sampleMovies.first {
+                        it.inMyList
+                    }
                 ),
                 onMovieClick = {},
                 onAddToMyListClick = {},

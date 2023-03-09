@@ -4,7 +4,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -32,7 +31,10 @@ fun NavGraphBuilder.myListScreen(
                     viewModel.removeFromMyList(it)
                 }
             },
-            onMovieClick = onNavigateToMovieDetails
+            onMovieClick = onNavigateToMovieDetails,
+            onRetryLoadMyList = {
+                viewModel.loadMyList()
+            }
         )
     }
 }

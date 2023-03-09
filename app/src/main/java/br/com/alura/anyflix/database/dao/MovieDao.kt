@@ -1,11 +1,9 @@
 package br.com.alura.anyflix.database.dao
 
 import androidx.room.Dao
-import androidx.room.Entity
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Update
 import br.com.alura.anyflix.database.entities.MovieEntity
 import br.com.alura.anyflix.model.Movie
 import kotlinx.coroutines.flow.Flow
@@ -15,6 +13,9 @@ interface MovieDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun save(movie: MovieEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun saveAll(vararg movies: MovieEntity)
 
     @Query("SELECT * FROM movies")
     fun findAll(): Flow<List<MovieEntity>>

@@ -51,29 +51,28 @@ class MovieDetailsViewModel @Inject constructor(
                 requireNotNull(
                     savedStateHandle[movieIdArgument]
                 )
-            ).map { it.toMovie() }
-                .flatMapLatest<Movie, MovieDetailsUiState> { movie ->
-                    dao.suggestedMovies(movie.id)
-                        .map { suggestedMovies ->
-                            Success(
-                                movie = movie,
-                                suggestedMovies = suggestedMovies,
-                            )
-                        }
-                }.catch {
-                    emit(MovieDetailsUiState.Failure)
-                }.collectLatest { uiState ->
-                    _uiState.emit(uiState)
-                }
+            ).flatMapLatest<Movie, MovieDetailsUiState> { movie ->
+                repository.suggestedMovies(movie.id)
+                    .map { suggestedMovies ->
+                        Success(
+                            movie = movie,
+                            suggestedMovies = suggestedMovies,
+                        )
+                    }
+            }.catch {
+                emit(MovieDetailsUiState.Failure)
+            }.collectLatest { uiState ->
+                _uiState.emit(uiState)
+            }
         }
     }
 
     suspend fun addToMyList(movie: Movie) {
-        dao.addToMyList(movie.id)
+        repository.addToMyList(movie.id)
     }
 
     suspend fun removeFromMyList(movie: Movie) {
-        dao.removeFromMyList(movie.id)
+        repository.removeFromMyList(movie.id)
     }
 
     fun loadMovie() {
