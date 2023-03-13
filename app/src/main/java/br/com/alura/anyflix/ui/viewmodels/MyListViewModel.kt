@@ -7,6 +7,7 @@ import br.com.alura.anyflix.model.Movie
 import br.com.alura.anyflix.repositories.MoviesRepository
 import br.com.alura.anyflix.ui.uistates.MyListUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,6 +23,7 @@ class MyListViewModel @Inject constructor(
     private val repository: MoviesRepository
 ) : ViewModel() {
 
+    private var currentUiStateJob: Job? = null
     private val _uiState = MutableStateFlow<MyListUiState>(
         MyListUiState.Loading
     )
@@ -32,7 +34,8 @@ class MyListViewModel @Inject constructor(
     }
 
     private fun loadUiState() {
-        viewModelScope.launch {
+        currentUiStateJob?.cancel()
+        currentUiStateJob = viewModelScope.launch {
             _uiState.update { MyListUiState.Loading }
             delay(Random.nextLong(500, 1000))
             repository.myList()

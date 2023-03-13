@@ -137,6 +137,7 @@ fun MyListScreen(
                                     model = movie.image,
                                     contentDescription = null,
                                     Modifier
+                                        .fillMaxWidth()
                                         .clip(RoundedCornerShape(8.dp))
                                         .zIndex(-1f),
                                     placeholder = ColorPainter(Color.Gray),

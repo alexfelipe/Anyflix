@@ -6,6 +6,7 @@ import br.com.alura.anyflix.repositories.MoviesRepository
 import br.com.alura.anyflix.sampleData.sampleMovies
 import br.com.alura.anyflix.ui.uistates.HomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,6 +25,7 @@ class HomeViewModel @Inject constructor(
     private val repository: MoviesRepository
 ) : ViewModel() {
 
+    private var currentUiStateJob: Job? = null
     private val _uiState = MutableStateFlow<HomeUiState>(
         HomeUiState.Loading
     )
@@ -34,7 +36,8 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun loadUiState() {
-        viewModelScope.launch {
+        currentUiStateJob?.cancel()
+        currentUiStateJob = viewModelScope.launch {
             _uiState.update { HomeUiState.Loading }
             delay(Random.nextLong(500, 1000))
             repository.findSections()
@@ -45,6 +48,7 @@ class HomeViewModel @Inject constructor(
                 }
                 .collect { sections ->
                     if (sections.isEmpty()) {
+                        delay(2000)
                         _uiState.update {
                             HomeUiState.Empty
                         }
