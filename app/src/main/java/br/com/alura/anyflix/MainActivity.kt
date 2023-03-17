@@ -30,6 +30,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -43,6 +44,7 @@ import br.com.alura.anyflix.ui.components.AnyflixBottomAppBar
 import br.com.alura.anyflix.ui.components.BottomAppBarItem
 import br.com.alura.anyflix.ui.theme.AnyFlixTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -53,7 +55,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.i("MainActivity", "onCreate: $service")
+        lifecycleScope.launch {
+            val response = service.findAll()
+            Log.i("MainActivity", "onCreate: response -> $response")
+        }
         setContent {
             AnyFlixTheme {
                 Surface(
