@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import br.com.alura.anyflix.database.dao.MovieDao
 import br.com.alura.anyflix.database.entities.toMovie
 import br.com.alura.anyflix.model.Movie
+import br.com.alura.anyflix.network.MovieService
+import br.com.alura.anyflix.network.toMovie
 import br.com.alura.anyflix.ui.uistates.HomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -23,7 +25,8 @@ import kotlin.random.Random
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val dao: MovieDao
+    private val dao: MovieDao,
+    private val service: MovieService
 ) : ViewModel() {
 
     private var currentUiStateJob: Job? = null
@@ -42,12 +45,20 @@ class HomeViewModel @Inject constructor(
         currentUiStateJob = viewModelScope.launch {
             _uiState.update { HomeUiState.Loading }
             delay(Random.nextLong(250, 1000))
-            dao.findAll()
-                .map {
-                    it.map { entity ->
-                        entity.toMovie()
+//            dao.findAll()
+//                .map {
+//                    it.map { entity ->
+//                        entity.toMovie()
+//                    }
+//                }
+                flow<List<Movie>> {
+                    val response = service.findAll()
+                    val movies = response.map {
+                        it.toMovie()
                     }
-                }.flatMapLatest { movies ->
+                    emit(movies)
+                }
+                .flatMapLatest { movies ->
                     flow {
                         if (movies.isEmpty()) {
                             emit(emptyMap())
