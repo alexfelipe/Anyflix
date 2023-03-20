@@ -1,31 +1,41 @@
 package br.com.alura.anyflix.repositories
 
+import android.util.Log
 import br.com.alura.anyflix.database.dao.MovieDao
 import br.com.alura.anyflix.database.entities.toMovie
 import br.com.alura.anyflix.model.Movie
 import br.com.alura.anyflix.network.MovieService
 import br.com.alura.anyflix.network.toMovieEntity
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import java.net.ConnectException
 import javax.inject.Inject
 import kotlin.coroutines.coroutineContext
+
+private const val TAG = "MovieRepository"
 
 class MovieRepository @Inject constructor(
     private val dao: MovieDao,
     private val service: MovieService
 ) {
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     suspend fun findSections(): Flow<Map<String, List<Movie>>> {
         CoroutineScope(coroutineContext).launch {
-            val response = service.findAll()
-            val movies = response.map {
-                it.toMovieEntity()
+            try {
+                val response = service.findAll()
+                val movies = response.map {
+                    it.toMovieEntity()
+                }
+                dao.saveAll(*movies.toTypedArray())
+            } catch (e: ConnectException) {
+                Log.e(TAG, "findSections: falha ao conectar na API", e)
             }
-            dao.saveAll(*movies.toTypedArray())
         }
         return dao.findAll()
             .map {

@@ -55,10 +55,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        lifecycleScope.launch {
-            val response = service.findAll()
-            Log.i("MainActivity", "onCreate: response -> $response")
-        }
         setContent {
             AnyFlixTheme {
                 Surface(
