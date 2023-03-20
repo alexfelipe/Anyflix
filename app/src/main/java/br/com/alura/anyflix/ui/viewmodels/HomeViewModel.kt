@@ -7,6 +7,7 @@ import br.com.alura.anyflix.database.entities.toMovie
 import br.com.alura.anyflix.model.Movie
 import br.com.alura.anyflix.network.MovieService
 import br.com.alura.anyflix.network.toMovie
+import br.com.alura.anyflix.repositories.MovieRepository
 import br.com.alura.anyflix.ui.uistates.HomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -25,8 +26,7 @@ import kotlin.random.Random
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val dao: MovieDao,
-    private val service: MovieService
+    private val repository: MovieRepository
 ) : ViewModel() {
 
     private var currentUiStateJob: Job? = null
@@ -39,34 +39,12 @@ class HomeViewModel @Inject constructor(
         loadUiState()
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private fun loadUiState() {
         currentUiStateJob?.cancel()
         currentUiStateJob = viewModelScope.launch {
             _uiState.update { HomeUiState.Loading }
             delay(Random.nextLong(250, 1000))
-//            dao.findAll()
-//                .map {
-//                    it.map { entity ->
-//                        entity.toMovie()
-//                    }
-//                }
-                flow<List<Movie>> {
-                    val response = service.findAll()
-                    val movies = response.map {
-                        it.toMovie()
-                    }
-                    emit(movies)
-                }
-                .flatMapLatest { movies ->
-                    flow {
-                        if (movies.isEmpty()) {
-                            emit(emptyMap())
-                        } else {
-                            emit(createSections(movies))
-                        }
-                    }
-                }
+            repository.findSections()
                 .catch {
                     _uiState.update {
                         HomeUiState.Failure
@@ -97,10 +75,5 @@ class HomeViewModel @Inject constructor(
         loadUiState()
     }
 
-    private fun createSections(movies: List<Movie>) = mapOf(
-        "Em alta" to movies.shuffled().take(7),
-        "Novidades" to movies.shuffled().take(7),
-        "Continue assistindo" to movies.shuffled().take(7)
-    )
 
 }

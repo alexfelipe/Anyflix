@@ -1,5 +1,6 @@
 package br.com.alura.anyflix.network
 
+import br.com.alura.anyflix.database.entities.MovieEntity
 import br.com.alura.anyflix.model.Movie
 import retrofit2.http.GET
 
@@ -9,7 +10,18 @@ data class MovieResponse(
     val image: String?,
     val year: Int,
     val plot: String
-)
+) {
+}
+
+fun MovieResponse.toMovieEntity(): MovieEntity {
+    return MovieEntity(
+        id = id,
+        title = title,
+        image = image,
+        year = year,
+        plot = plot
+    )
+}
 
 fun MovieResponse.toMovie(): Movie {
     return Movie(
