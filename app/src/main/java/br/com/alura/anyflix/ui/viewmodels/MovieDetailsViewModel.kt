@@ -7,6 +7,7 @@ import br.com.alura.anyflix.database.dao.MovieDao
 import br.com.alura.anyflix.database.entities.toMovie
 import br.com.alura.anyflix.model.Movie
 import br.com.alura.anyflix.navigation.movieIdArgument
+import br.com.alura.anyflix.repositories.MovieRepository
 import br.com.alura.anyflix.ui.uistates.MovieDetailsUiState
 import br.com.alura.anyflix.ui.uistates.MovieDetailsUiState.Success
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,7 +28,7 @@ import kotlin.random.Random
 @HiltViewModel
 class MovieDetailsViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
-    private val dao: MovieDao
+    private val repository: MovieRepository
 ) : ViewModel() {
     private var currentUiStateJob: Job? = null
 
@@ -46,13 +47,12 @@ class MovieDetailsViewModel @Inject constructor(
         currentUiStateJob = viewModelScope.launch {
             _uiState.update { MovieDetailsUiState.Loading }
             delay(Random.nextLong(250, 1000))
-            dao.findMovieById(
+            repository.findMovieById(
                 requireNotNull(
                     savedStateHandle[movieIdArgument]
                 )
-            ).map { it.toMovie() }
-                .flatMapLatest<Movie, MovieDetailsUiState> { movie ->
-                    dao.suggestedMovies(movie.id)
+            ).flatMapLatest<Movie, MovieDetailsUiState> { movie ->
+                    repository.suggestedMovies(movie.id)
                         .map { suggestedMovies ->
                             Success(
                                 movie = movie,
@@ -68,11 +68,11 @@ class MovieDetailsViewModel @Inject constructor(
     }
 
     suspend fun addToMyList(movie: Movie) {
-        dao.addToMyList(movie.id)
+        repository.addToMyList(movie.id)
     }
 
     suspend fun removeFromMyList(movie: Movie) {
-        dao.removeFromMyList(movie.id)
+        repository.removeFromMyList(movie.id)
     }
 
     fun loadMovie() {

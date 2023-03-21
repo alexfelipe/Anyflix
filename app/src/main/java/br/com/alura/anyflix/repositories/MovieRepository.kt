@@ -62,7 +62,7 @@ class MovieRepository @Inject constructor(
                     .map { it.toMovieEntity() }
                 dao.saveAll(*myList.toTypedArray())
             } catch (e: ConnectException) {
-                Log.e(TAG, "findSections: falha ao conectar na API", e)
+                Log.e(TAG, "myList: falha ao conectar na API", e)
             } catch (e: HttpException) {
                 Log.e(TAG, "myList: não encontrou filmes na minha lista", e)
             }
@@ -71,8 +71,19 @@ class MovieRepository @Inject constructor(
             .map { it.map { entity -> entity.toMovie() } }
     }
 
-    fun removeFromMyList(id: String) {
-        TODO("Not yet implemented")
+    suspend fun findMovieById(id: String): Flow<Movie> {
+        CoroutineScope(coroutineContext).launch {
+            try {
+                val response = service.findMovieById(id)
+                dao.save(response.toMovieEntity())
+            } catch (e: ConnectException) {
+                Log.e(TAG, "findMovieById: falha ao conectar na API", e)
+            } catch (e: HttpException) {
+                Log.e(TAG, "findMovieById: não encontrou o filme a partir do id: $id", e)
+            }
+        }
+        return dao.findMovieById(id)
+            .map { it.toMovie() }
     }
 
     private fun createSections(movies: List<Movie>) = mapOf(
@@ -80,5 +91,38 @@ class MovieRepository @Inject constructor(
         "Novidades" to movies.shuffled().take(7),
         "Continue assistindo" to movies.shuffled().take(7)
     )
+
+    fun suggestedMovies(id: String): Flow<List<Movie>> =
+        dao.suggestedMovies(id)
+
+    suspend fun removeFromMyList(id: String) {
+        CoroutineScope(coroutineContext).launch {
+            try {
+                service.removeFromMyList(id)
+            } catch (e: ConnectException) {
+                Log.e(TAG, "addToMyList: falha ao conectar na API", e)
+            } catch (e: HttpException) {
+                Log.e(TAG, "addToMyList: não encontrou o filme a partir do id: $id", e)
+            }
+            launch {
+                dao.removeFromMyList(id)
+            }
+        }
+    }
+
+    suspend fun addToMyList(id: String) {
+        CoroutineScope(coroutineContext).launch {
+            try {
+                service.addToMyList(id)
+            } catch (e: ConnectException) {
+                Log.e(TAG, "addToMyList: falha ao conectar na API", e)
+            } catch (e: HttpException) {
+                Log.e(TAG, "addToMyList: não encontrou o filme a partir do id: $id", e)
+            }
+            launch {
+                dao.addToMyList(id)
+            }
+        }
+    }
 
 }
