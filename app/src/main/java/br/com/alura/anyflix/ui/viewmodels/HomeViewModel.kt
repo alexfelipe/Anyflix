@@ -2,23 +2,14 @@ package br.com.alura.anyflix.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import br.com.alura.anyflix.database.dao.MovieDao
-import br.com.alura.anyflix.database.entities.toMovie
-import br.com.alura.anyflix.model.Movie
-import br.com.alura.anyflix.network.MovieService
-import br.com.alura.anyflix.network.toMovie
 import br.com.alura.anyflix.repositories.MovieRepository
 import br.com.alura.anyflix.ui.uistates.HomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject

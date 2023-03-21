@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 import java.net.ConnectException
 import javax.inject.Inject
 import kotlin.coroutines.coroutineContext
@@ -52,6 +53,26 @@ class MovieRepository @Inject constructor(
                 }
             }
 
+    }
+
+    suspend fun myList(): Flow<List<Movie>> {
+        CoroutineScope(coroutineContext).launch {
+            try {
+                val myList = service.findMyList()
+                    .map { it.toMovieEntity() }
+                dao.saveAll(*myList.toTypedArray())
+            } catch (e: ConnectException) {
+                Log.e(TAG, "findSections: falha ao conectar na API", e)
+            } catch (e: HttpException) {
+                Log.e(TAG, "myList: não encontrou filmes na minha lista", e)
+            }
+        }
+        return dao.myList()
+            .map { it.map { entity -> entity.toMovie() } }
+    }
+
+    fun removeFromMyList(id: String) {
+        TODO("Not yet implemented")
     }
 
     private fun createSections(movies: List<Movie>) = mapOf(

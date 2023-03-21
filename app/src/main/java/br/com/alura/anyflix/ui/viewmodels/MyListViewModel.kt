@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import br.com.alura.anyflix.database.dao.MovieDao
 import br.com.alura.anyflix.database.entities.toMovie
 import br.com.alura.anyflix.model.Movie
+import br.com.alura.anyflix.repositories.MovieRepository
 import br.com.alura.anyflix.ui.uistates.MyListUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -20,7 +21,7 @@ import kotlin.random.Random
 
 @HiltViewModel
 class MyListViewModel @Inject constructor(
-    private val dao: MovieDao
+    private val repository: MovieRepository
 ) : ViewModel() {
 
     private var currentUiStateJob: Job? = null
@@ -38,8 +39,7 @@ class MyListViewModel @Inject constructor(
         currentUiStateJob = viewModelScope.launch {
             _uiState.update { MyListUiState.Loading }
             delay(Random.nextLong(250, 1000))
-            dao.myList()
-                .map { it.map { entity -> entity.toMovie() } }
+            repository.myList()
                 .catch {
                     MyListUiState.Failure
                 }
@@ -56,7 +56,7 @@ class MyListViewModel @Inject constructor(
     }
 
     suspend fun removeFromMyList(movie: Movie) {
-        dao.removeFromMyList(movie.id)
+        repository.removeFromMyList(movie.id)
     }
 
     fun loadMyList() {
