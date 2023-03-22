@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "5a788d96601d6652c78d7811f6bf68dc",
+    "identityHash": "c81ed71ea9cabd0184f8b58a85662e88",
     "entities": [
       {
         "tableName": "movies",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `title` TEXT NOT NULL, `year` INTEGER NOT NULL, `plot` TEXT NOT NULL, `image` TEXT, `inMyList` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `title` TEXT NOT NULL, `year` INTEGER NOT NULL, `plot` TEXT NOT NULL, `image` TEXT, `inMyList` INTEGER NOT NULL, `synchronized` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -43,6 +43,12 @@
             "columnName": "inMyList",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "synchronized",
+            "columnName": "synchronized",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -58,7 +64,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5a788d96601d6652c78d7811f6bf68dc')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c81ed71ea9cabd0184f8b58a85662e88')"
     ]
   }
 }

@@ -2,7 +2,9 @@ package br.com.alura.anyflix.repositories
 
 import android.util.Log
 import br.com.alura.anyflix.database.dao.MovieDao
+import br.com.alura.anyflix.database.entities.MovieEntity
 import br.com.alura.anyflix.database.entities.toMovie
+import br.com.alura.anyflix.database.entities.toMovieRequest
 import br.com.alura.anyflix.model.Movie
 import br.com.alura.anyflix.network.MovieService
 import br.com.alura.anyflix.network.toMovieEntity
@@ -29,6 +31,18 @@ class MovieRepository @Inject constructor(
     suspend fun findSections(): Flow<Map<String, List<Movie>>> {
         CoroutineScope(coroutineContext).launch {
             try {
+                val moviesTobeSynchronized = dao.findAllMoviesNotSynchronized()
+                Log.i(TAG, "findSections: moviesToBeSynchronized -> $moviesTobeSynchronized")
+                val moviesToBeSave = mutableListOf<MovieEntity>()
+                moviesTobeSynchronized.forEach { entity ->
+                    val id = entity.id
+                    val request = entity.toMovieRequest()
+                    val updatedMovie = service
+                        .update(id, request)
+                        .toMovieEntity()
+                    moviesToBeSave.add(updatedMovie)
+                }
+                Log.i(TAG, "findSections: moviesToBeSave -> $moviesToBeSave")
                 val response = service.findAll()
                 val movies = response.map {
                     it.toMovieEntity()
@@ -94,6 +108,7 @@ class MovieRepository @Inject constructor(
 
     fun suggestedMovies(id: String): Flow<List<Movie>> =
         dao.suggestedMovies(id)
+            .map { it.map { entity -> entity.toMovie() } }
 
     suspend fun removeFromMyList(id: String) {
         CoroutineScope(coroutineContext).launch {

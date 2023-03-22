@@ -33,6 +33,9 @@ interface MovieDao {
     fun findMovieById(id: String): Flow<MovieEntity>
 
     @Query("SELECT * FROM movies WHERE inMyList = 0 and id != :id")
-    fun suggestedMovies(id: String): Flow<List<Movie>>
+    fun suggestedMovies(id: String): Flow<List<MovieEntity>>
+
+    @Query("SELECT * FROM movies WHERE synchronized = 0")
+    suspend fun findAllMoviesNotSynchronized(): List<MovieEntity>
 
 }
