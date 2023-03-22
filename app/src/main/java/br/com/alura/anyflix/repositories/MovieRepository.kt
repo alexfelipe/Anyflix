@@ -8,13 +8,11 @@ import br.com.alura.anyflix.network.MovieService
 import br.com.alura.anyflix.network.toMovieEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.net.ConnectException
+import java.net.SocketTimeoutException
 import javax.inject.Inject
 import kotlin.coroutines.coroutineContext
 
@@ -25,9 +23,15 @@ class MovieRepository @Inject constructor(
     private val service: MovieService
 ) {
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    suspend fun findSections(): Flow<Map<String, List<Movie>>> {
-        CoroutineScope(coroutineContext).launch {
+    data class Result<T>(
+        val data: T? = null,
+        val exception: Exception? = null
+    )
+
+    suspend fun findSections(): Flow<Result<Map<String, List<Movie>>>> {
+        val flow = MutableStateFlow<Result<Map<String, List<Movie>>>>(Result())
+        val scope = CoroutineScope(coroutineContext)
+        scope.launch {
             try {
                 val response = service.findAll()
                 val movies = response.map {
@@ -35,24 +39,36 @@ class MovieRepository @Inject constructor(
                 }
                 dao.saveAll(*movies.toTypedArray())
             } catch (e: ConnectException) {
+                flow.update {
+                    it.copy(exception = e)
+                }
+                Log.e(TAG, "findSections: falha ao conectar na API", e)
+            } catch (e: SocketTimeoutException) {
+                flow.update {
+                    it.copy(exception = e)
+                }
                 Log.e(TAG, "findSections: falha ao conectar na API", e)
             }
         }
-        return dao.findAll()
-            .map {
-                it.map { entity ->
-                    entity.toMovie()
-                }
-            }.flatMapLatest { movies ->
-                flow {
+        scope.launch {
+            dao.findAll()
+                .map {
+                    it.map { entity ->
+                        entity.toMovie()
+                    }
+                }.collect { movies ->
                     if (movies.isEmpty()) {
-                        emit(emptyMap())
+                        flow.update {
+                            it.copy(data = emptyMap())
+                        }
                     } else {
-                        emit(createSections(movies))
+                        flow.update {
+                            it.copy(data = createSections(movies))
+                        }
                     }
                 }
-            }
-
+        }
+        return flow
     }
 
     suspend fun myList(): Flow<List<Movie>> {

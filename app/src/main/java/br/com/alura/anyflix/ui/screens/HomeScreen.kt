@@ -1,17 +1,13 @@
 package br.com.alura.anyflix.ui.screens
 
+import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -26,8 +22,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import br.com.alura.anyflix.model.Movie
 import br.com.alura.anyflix.sampleData.sampleMovieSections
 import br.com.alura.anyflix.sampleData.sampleMovies
@@ -43,80 +41,119 @@ fun HomeScreen(
     onRetryLoadSections: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    when (uiState) {
-        HomeUiState.Failure -> {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Falha ao carregar as seções",
-                    style = TextStyle.Default.copy(
-                        fontSize = MaterialTheme.typography.titleLarge.fontSize
-                    )
-                )
-                TextButton(onClick = { onRetryLoadSections() }) {
-                    Text(text = "Tentar buscar novamente")
-                }
-            }
+    val isLoading = uiState.isLoading
+    val error = uiState.error
+    Log.i("HomeScreen", "HomeScreen: uiState $uiState")
+    if (isLoading) {
+        Box(Modifier.fillMaxSize()) {
+            CircularProgressIndicator(
+                Modifier.align(Alignment.Center)
+            )
         }
-        HomeUiState.Loading -> {
-            Box(Modifier.fillMaxSize()) {
-                CircularProgressIndicator(
-                    Modifier.align(Alignment.Center)
-                )
-            }
-        }
-        is HomeUiState.Success -> {
-            val sections = uiState.sections
-            Box(modifier) {
-                LazyColumn {
-                    item {
-                        uiState.mainBannerMovie?.let { movie ->
-                            AnyflixMainBanner(
-                                movie = movie,
-                                Modifier.height(300.dp),
-                                onMovieClick = onMovieClick,
+    } else {
+        Box {
+            error?.let {
+                Box(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .background(
+                            Color.Red.copy(alpha = 0.5f),
+                            shape = RoundedCornerShape(15)
+                        )
+                        .fillMaxWidth()
+                        .zIndex(1f)
+                        .padding(16.dp)
+                        .clip(RoundedCornerShape(15)),
+                ) {
+                    Column {
+                        Text(
+                            text = "Falha ao carregar as seções",
+                            Modifier.fillMaxWidth(),
+                            style = TextStyle.Default.copy(
+                                fontSize = MaterialTheme.typography.titleLarge.fontSize
+                            ),
+                            textAlign = TextAlign.Center
+                        )
+                        TextButton(onClick = { onRetryLoadSections() }) {
+                            Text(
+                                text = "Tentar buscar novamente",
+                                Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.Center
                             )
                         }
                     }
-                    sections.forEach {
-                        val title = it.key
-                        val movies = it.value
-                        item {
-                            Column {
-                                Text(
-                                    text = title,
-                                    Modifier.padding(
-                                        horizontal = 16.dp,
-                                        vertical = 8.dp
-                                    ),
-                                    style = TextStyle.Default.copy(
-                                        fontSize = MaterialTheme.typography.titleMedium.fontSize
-                                    )
+                }
+            }
+            uiState.sections?.let { sections ->
+                when {
+                    sections.isEmpty() -> {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "Nenhuma seção encontrada",
+                                style = TextStyle.Default.copy(
+                                    fontSize = MaterialTheme.typography.titleLarge.fontSize
                                 )
-                                LazyRow(
-                                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                                    contentPadding = PaddingValues(
-                                        horizontal = 16.dp,
-                                        vertical = 8.dp
-                                    )
-                                ) {
-                                    items(movies) { movie ->
-                                        AsyncImage(
-                                            model = movie.image,
-                                            contentDescription = null,
-                                            Modifier
-                                                .width(150.dp)
-                                                .height(200.dp)
-                                                .clip(RoundedCornerShape(8.dp))
-                                                .clickable {
-                                                    onMovieClick(movie)
-                                                },
-                                            placeholder = ColorPainter(Color.Gray),
-                                            contentScale = ContentScale.Crop
+                            )
+                            TextButton(onClick = { onRetryLoadSections() }) {
+                                Text(text = "Tentar buscar novamente")
+                            }
+                        }
+                    }
+                    else -> {
+                        Box(modifier) {
+                            LazyColumn {
+                                item {
+                                    uiState.mainBannerMovie?.let { movie ->
+                                        AnyflixMainBanner(
+                                            movie = movie,
+                                            Modifier.height(300.dp),
+                                            onMovieClick = onMovieClick,
                                         )
+                                    }
+                                }
+                                sections.forEach {
+                                    val title = it.key
+                                    val movies = it.value
+                                    item {
+                                        Column {
+                                            Text(
+                                                text = title,
+                                                Modifier.padding(
+                                                    horizontal = 16.dp,
+                                                    vertical = 8.dp
+                                                ),
+                                                style = TextStyle.Default.copy(
+                                                    fontSize = MaterialTheme.typography.titleMedium.fontSize
+                                                )
+                                            )
+                                            LazyRow(
+                                                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                                                contentPadding = PaddingValues(
+                                                    horizontal = 16.dp,
+                                                    vertical = 8.dp
+                                                )
+                                            ) {
+                                                items(movies) { movie ->
+                                                    AsyncImage(
+                                                        model = movie.image,
+                                                        contentDescription = null,
+                                                        Modifier
+                                                            .width(150.dp)
+                                                            .height(200.dp)
+                                                            .clip(RoundedCornerShape(8.dp))
+                                                            .clickable {
+                                                                onMovieClick(movie)
+                                                            },
+                                                        placeholder = ColorPainter(Color.Gray),
+                                                        contentScale = ContentScale.Crop
+                                                    )
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -124,28 +161,10 @@ fun HomeScreen(
                     }
                 }
             }
-
         }
 
-        HomeUiState.Empty -> {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Nenhuma seção encontrada",
-                    style = TextStyle.Default.copy(
-                        fontSize = MaterialTheme.typography.titleLarge.fontSize
-                    )
-                )
-                TextButton(onClick = { onRetryLoadSections() }) {
-                    Text(text = "Tentar buscar novamente")
-                }
-            }
-        }
+
     }
-
 }
 
 @Preview(showBackground = true)
@@ -154,7 +173,7 @@ fun HomeScreenPreview() {
     AnyFlixTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             HomeScreen(
-                uiState = HomeUiState.Success(
+                uiState = HomeUiState(
                     sections = sampleMovieSections,
                     mainBannerMovie = sampleMovies.random()
                 ),
@@ -171,7 +190,7 @@ fun HomeScreenWithoutSections() {
     AnyFlixTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             HomeScreen(
-                uiState = HomeUiState.Empty,
+                uiState = HomeUiState(),
                 onRetryLoadSections = {},
                 onMovieClick = {}
             )
@@ -185,7 +204,7 @@ fun HomeScreenWithFailurePreview() {
     AnyFlixTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             HomeScreen(
-                uiState = HomeUiState.Failure,
+                uiState = HomeUiState(error = "falha ao buscar filmes"),
                 onRetryLoadSections = {},
                 onMovieClick = {}
             )

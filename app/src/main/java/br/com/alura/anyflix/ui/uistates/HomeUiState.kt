@@ -2,17 +2,9 @@ package br.com.alura.anyflix.ui.uistates
 
 import br.com.alura.anyflix.model.Movie
 
-sealed class HomeUiState {
-
-    object Loading : HomeUiState()
-
-    object Failure : HomeUiState()
-
-    object Empty : HomeUiState()
-
-    data class Success(
-        val sections: Map<String, List<Movie>> = emptyMap(),
-        val mainBannerMovie: Movie? = null
-    ) : HomeUiState()
-
-}
+data class HomeUiState(
+    val mainBannerMovie: Movie? = null,
+    val error: String? = null,
+    val isLoading: Boolean = false,
+    val sections: Map<String, List<Movie>>? = null
+)
